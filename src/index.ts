@@ -1,14 +1,8 @@
 import './index.html';
 import './index.scss';
+import {Tetris} from "./tetris";
 
-const width = 10;
-const height = 20;
-
-class Tetris {
-    score = 0;
-    level = 0;
-}
-
+const game = new Tetris();
 
 const root: HTMLElement = document.getElementById('root');
 const canvas: HTMLCanvasElement = document.createElement('canvas');
@@ -34,28 +28,32 @@ const field = [
     [0, 0, 0, 0, 0, 0],
 ];
 
-for (const row in field) {
-    console.log('row: ', row);
-    console.log('LOG: ', field[row]);
+const render = () => {
+    for (const index in field) {
+        const row = field[index];
+        const y = +index * 25;
+
+        for (const rowEl in row) {
+            const piece = row[rowEl];
+            const x = +rowEl * 25;
+
+            ctx.fillStyle = piece ? "red" : 'white';
+            ctx.fillRect(x, y, 25, 25);
+
+            ctx.strokeStyle = piece ? "white" : 'gray';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(x, y, 25, 25);
+        }
+    }
 }
 
+setInterval(()=> {
+    render();
 
-ctx.fillStyle = "red";
-ctx.fillRect(50, 50, 25, 25);
+    const row = field.pop();
+    field.unshift(row)
 
-ctx.fillStyle = "blue";
-ctx.fillRect(50, 25, 25, 25);
-
-// Намалюємо прямокутник
-ctx.fillStyle = "red";
-ctx.fillRect(50, 50, 100, 100);
-
-// Намалюємо рамку навколо прямокутника
-ctx.strokeStyle = "green";
-ctx.lineWidth = 2
-ctx.strokeRect(50, 50, 100, 100);
-
-
+}, 1000)
 
 
 root.appendChild(canvas)
