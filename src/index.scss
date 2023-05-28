@@ -1,0 +1,19 @@
+@import '~normalize.css';
+@import 'public/style/fonts';
+@import 'public/style/var';
+
+body {
+  font-family: 'Montserrat';
+  background-color: #fff;
+  color: $text;
+}
+
+#root {
+  padding: 10px;
+  margin: 10px;
+  border: 1px solid saddlebrown;
+}
+
+canvas {
+  border: 1px solid darkgreen;
+}
