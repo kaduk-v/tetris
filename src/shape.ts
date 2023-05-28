@@ -1,5 +1,8 @@
 import {ShapeOrientation} from "./config";
 
+/**
+ * Two-dimensional matrix.
+ */
 export type Tetromino = number[][];
 
 export interface Shape {
