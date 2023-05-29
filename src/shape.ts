@@ -1,4 +1,5 @@
 import { ShapeRotation } from "./config";
+import { map } from "lodash";
 
 /**
  * Two-dimensional matrix.
@@ -12,6 +13,42 @@ export abstract class Shape {
     abstract color: string;
 
     abstract tetromino: Tetromino;
+
+    getSize() {
+        const rows = [];
+        const cells = [];
+
+        for (let i = 0; i < this.tetromino.length; i++) {
+            const  passes = this.tetromino[i].some(el=>!!el);
+
+            if (passes) {
+                rows.push(this.tetromino[i])
+            }
+        }
+
+        const res = rows.map((row)=> row.findIndex(el=> el===1))
+
+        const max=  Math.max(...res);
+        const min=  Math.min(...res);
+
+
+        const shape = [];
+        for (let i = 0; i < rows.length ; i++) {
+            const row = [];
+
+            for (let j = min; j <= max; j++) {
+                row.push(rows[i][j])
+            }
+
+            shape.push(row)
+        } 
+
+        return shape
+
+
+        // // calculate real size of current shape position (without empty pieces of tetromino)
+        // return [rows.length, Math.max(...res)]
+    }
 
     /**
      *  Rotate a 2 dimensional matrix 90 degrees.
@@ -35,7 +72,7 @@ export abstract class Shape {
 /**
  * Straight line. Shaped like a capital I.
  */
-export class I extends Shape {
+export class ShapeI extends Shape {
     color: string = '#41bef8';
     tetromino: Tetromino = [
         [ 1, 1, 1, 1 ],
@@ -48,7 +85,7 @@ export class I extends Shape {
 /**
  * Square shape. Shaped like a capital O.
  */
-export class O extends Shape {
+export class ShapeO extends Shape {
     color: string = '#ffff43';
     tetromino: Tetromino = [
         [ 1, 1 ],
@@ -59,19 +96,23 @@ export class O extends Shape {
 /**
  * A row of three Minos with one added above the center. Shaped like a capital T.
  */
-export class T extends Shape {
+export class ShapeT extends Shape {
     color: string = '#7929f1';
     tetromino: Tetromino = [
         [ 0, 1, 0 ],
         [ 1, 1, 1 ],
         [ 0, 0, 0 ],
     ];
+    coordinate =  0;
+    coordinates =  [0,0];
+
+
 }
 
 /**
  * Two stacked horizontal diminos with the top one offset to the right. Shaped like a capital S.
  */
-class S extends Shape {
+class ShapeS extends Shape {
     color: string = '#11ea44';
     tetromino: Tetromino = [
         [ 0, 0, 1, 1 ],
@@ -84,7 +125,7 @@ class S extends Shape {
 /**
  * Two stacked horizontal diminos with the top one offset to the left. Shaped like a capital Z.
  */
-class Z extends Shape {
+class ShapeZ extends Shape {
     color: string = '#f30000';
     tetromino: Tetromino = [
         [ 1, 1, 0, 0 ],
@@ -97,7 +138,7 @@ class Z extends Shape {
 /**
  * A row of three Minos with one added above the left side. Shaped like a capital J.
  */
-class J extends Shape {
+class ShapeJ extends Shape {
     color: string = '#0662ea';
     tetromino: Tetromino = [
         [ 1, 0, 0, 0 ],
@@ -110,7 +151,7 @@ class J extends Shape {
 /**
  * A row of three Minos with one added above the right side. Shaped like a capital L.
  */
-class L extends Shape {
+class ShapeL extends Shape {
     color: string = '#ea8706';
     tetromino: Tetromino = [
         [ 0, 0, 0, 1 ],
