@@ -36,7 +36,7 @@ export abstract class Shape {
             }
         }
 
-        // return the destination matrix
+        // set a rotated matrix
         this.tetromino = destination;
     }
 }
