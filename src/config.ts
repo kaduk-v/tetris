@@ -8,6 +8,11 @@ export enum ShapeOrientation {
     Down
 }
 
+export enum ShapeRotation {
+    Clockwise = 1,
+    CounterClockwise = 2,
+}
+
 export enum PlayfieldSize {
     Width = 10,
     Height = 20
