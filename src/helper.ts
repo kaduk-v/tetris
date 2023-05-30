@@ -1,7 +1,7 @@
 import { Matrix2D } from "./shape";
 import { Coordinate } from "./config";
 
-export const has2DMatrixElement = (matrix: Matrix2D, row: number, col: number): boolean => {
+export const hasMatrix2DElement = (matrix: Matrix2D, row: number, col: number): boolean => {
     return matrix[row] !== undefined && matrix[row][col] !== undefined;
 }
 

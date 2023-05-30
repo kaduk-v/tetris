@@ -2,13 +2,28 @@
  * Y-Axis. First element.
  * X-Axis. Second element.
  */
-export type Coordinate = [number, number];
+export type Coordinate = [ number, number ];
 
 export enum ShapeOrientation {
     Up,
     Right,
     Left,
     Down
+}
+
+/**
+ * Keyboard code.
+ */
+export enum Key {
+    Space = 'Space',
+    Left = 'ArrowLeft',
+    Right = 'ArrowRight',
+    Up = 'ArrowUp',
+    Down = 'ArrowDown',
+    A = 'KeyA',
+    S = 'KeyS',
+    D = 'KeyD',
+    W = 'KeyW'
 }
 
 export enum ShapeRotation {

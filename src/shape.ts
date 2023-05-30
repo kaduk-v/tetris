@@ -149,11 +149,38 @@ export class ShapeJ extends Shape {
  * A row of three Minos with one added above the right side. Shaped like a capital L.
  */
 export class ShapeL extends Shape {
-    color: string = '#ea8706';
+    color: string = Color.Orange;
     tetromino: Matrix2D = [
         [ 0, 0, 0, 1 ],
         [ 1, 1, 1, 1 ],
         [ 0, 0, 0, 0 ],
         [ 0, 0, 0, 0 ],
+    ];
+}
+
+
+// TODO: additional shapes
+export class ShapeDot extends Shape {
+    color: string = '#ea8706';
+    tetromino: Matrix2D = [
+        [ 1 ],
+    ];
+}
+
+export class ShapeX extends Shape {
+    color: string = '#ea8706';
+    tetromino: Matrix2D = [
+        [ 0, 1, 0 ],
+        [ 1, 1, 1 ],
+        [ 0, 1, 0 ],
+    ];
+}
+
+export class ShapeU extends Shape {
+    color: string = '#ea8706';
+    tetromino: Matrix2D = [
+        [ 1, 0, 1 ],
+        [ 1, 1, 1 ],
+        [ 0, 0, 0 ],
     ];
 }

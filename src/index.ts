@@ -1,9 +1,9 @@
 import './index.html';
 import './index.scss';
 import { Tetris } from "./tetris";
-import { ShapeI, ShapeJ, ShapeL, ShapeO, ShapeS, ShapeT } from "./shape";
-import { has2DMatrixElement, issetCoordinate } from "./helper";
-import { Color } from "./config";
+import { ShapeDot, ShapeI, ShapeJ, ShapeL, ShapeO, ShapeS, ShapeT, ShapeU, ShapeX } from "./shape";
+import { hasMatrix2DElement, issetCoordinate } from "./helper";
+import { Color, Key } from "./config";
 
 const root: HTMLElement = document.getElementById('root');
 const canvas: HTMLCanvasElement = document.createElement('canvas');
@@ -25,7 +25,13 @@ const s = new ShapeS();
 const j = new ShapeJ();
 const l = new ShapeL();
 
-const shape = j;
+const dot = new ShapeDot();
+const x = new ShapeX();
+const u = new ShapeU();
+
+const shape = t;
+
+game.shape = shape;
 
 const render = () => {
     const height = game.playfield.length;
@@ -54,6 +60,7 @@ const render = () => {
         }
     }
 }
+
 
 render();
 

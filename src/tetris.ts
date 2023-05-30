@@ -1,5 +1,5 @@
 import {Shape} from "./shape";
-import { Coordinate, Playfield } from "./config";
+import { Coordinate, Key, Playfield } from "./config";
 
 
 export class Tetris {
@@ -29,6 +29,45 @@ export class Tetris {
      * Next shape.
      */
     nextShape: Shape;
+
+    constructor() {
+        this.initEvents();
+    }
+
+    initEvents() {
+        document.addEventListener("keydown", (e: KeyboardEvent) => {
+            switch (e.code) {
+                case Key.Left:
+                case Key.A:
+                    console.log('Left');
+                    break;
+
+                case Key.Right:
+                case Key.D:
+                    this.moveRight();
+
+                    break;
+
+                case Key.Down:
+                case Key.S:
+                    console.log('Down');
+                    break;
+
+                case Key.Up:
+                case Key.W:
+                    console.log('Up');
+                    break;
+
+                case Key.Space:
+                    console.log('Space');
+                    break;
+            }
+        });
+    }
+
+    moveRight() {
+
+    }
 
     getStartCoordinates(shape: Shape): Coordinate {
         const x = ~~((this.playfield[0].length - shape.tetromino[0].length) / 2);
