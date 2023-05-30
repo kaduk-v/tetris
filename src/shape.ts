@@ -1,4 +1,4 @@
-import { ShapeRotation } from "./config";
+import { Color, Coordinate, ShapeRotation } from "./config";
 
 /**
  * Two-dimensional matrix.
@@ -19,24 +19,25 @@ export abstract class Shape {
     /**
      * Real size of shape position (without empty pieces of tetromino).
      */
-    getBlock(): Matrix2D {
+    getBlock(offsetX: number) {
         const rows = [];
+        const coor: Coordinate[] = [];
 
-        for (let i = 0; i < this.tetromino.length; i++) {
-            const passes = this.tetromino[i].some(el => !!el);
+        // each row
+        for (let y = 0; y < this.tetromino.length; y++) {
+            const passes = this.tetromino[y].some(el => !!el);
 
             if (passes) {
-                rows.push(this.tetromino[i])
+                this.tetromino[y].map((el: number, x: number): number => (el === 1) ? coor.push([ y, x + offsetX ]) : null);
+                rows.push(this.tetromino[y])
             }
         }
 
         const mins = rows.map((row) => row.findIndex(el => !!el))
         const maxs = rows.map((row) => row.findLastIndex(el => !!el))
 
-
         const max = Math.max(...maxs);
         const min = Math.min(...mins);
-
 
         const block = [];
         for (let i = 0; i < rows.length; i++) {
@@ -49,7 +50,7 @@ export abstract class Shape {
             block.push(row)
         }
 
-        return block;
+        return { coor, block };
     }
 
     /**
@@ -75,7 +76,7 @@ export abstract class Shape {
  * Straight line. Shaped like a capital I.
  */
 export class ShapeI extends Shape {
-    color: string = '#41bef8';
+    color: Color = Color.LightBlue;
     tetromino: Matrix2D = [
         [ 1, 1, 1, 1 ],
         [ 0, 0, 0, 0 ],
@@ -88,7 +89,7 @@ export class ShapeI extends Shape {
  * Square shape. Shaped like a capital O.
  */
 export class ShapeO extends Shape {
-    color: string = '#ffff43';
+    color: Color = Color.Yellow;
     tetromino: Matrix2D = [
         [ 1, 1 ],
         [ 1, 1 ],
@@ -99,7 +100,7 @@ export class ShapeO extends Shape {
  * A row of three Minos with one added above the center. Shaped like a capital T.
  */
 export class ShapeT extends Shape {
-    color: string = '#7929f1';
+    color: Color = Color.Purple;
     tetromino: Matrix2D = [
         [ 0, 1, 0 ],
         [ 1, 1, 1 ],
@@ -110,34 +111,32 @@ export class ShapeT extends Shape {
 /**
  * Two stacked horizontal diminos with the top one offset to the right. Shaped like a capital S.
  */
-class ShapeS extends Shape {
-    color: string = '#11ea44';
+export class ShapeS extends Shape {
+    color: Color = Color.Green;
     tetromino: Matrix2D = [
-        [ 0, 0, 1, 1 ],
-        [ 1, 1, 0, 0 ],
-        [ 0, 0, 0, 0 ],
-        [ 0, 0, 0, 0 ],
+        [ 0, 1, 1 ],
+        [ 1, 1, 0 ],
+        [ 0, 0, 0 ],
     ];
 }
 
 /**
  * Two stacked horizontal diminos with the top one offset to the left. Shaped like a capital Z.
  */
-class ShapeZ extends Shape {
-    color: string = '#f30000';
+export class ShapeZ extends Shape {
+    color: Color = Color.Red;
     tetromino: Matrix2D = [
-        [ 1, 1, 0, 0 ],
-        [ 0, 0, 1, 1 ],
-        [ 0, 0, 0, 0 ],
-        [ 0, 0, 0, 0 ],
+        [ 1, 1, 0 ],
+        [ 0, 1, 1 ],
+        [ 0, 0, 0 ],
     ];
 }
 
 /**
  * A row of three Minos with one added above the left side. Shaped like a capital J.
  */
-class ShapeJ extends Shape {
-    color: string = '#0662ea';
+export class ShapeJ extends Shape {
+    color: Color = Color.Blue;
     tetromino: Matrix2D = [
         [ 1, 0, 0, 0 ],
         [ 1, 1, 1, 1 ],
@@ -149,7 +148,7 @@ class ShapeJ extends Shape {
 /**
  * A row of three Minos with one added above the right side. Shaped like a capital L.
  */
-class ShapeL extends Shape {
+export class ShapeL extends Shape {
     color: string = '#ea8706';
     tetromino: Matrix2D = [
         [ 0, 0, 0, 1 ],

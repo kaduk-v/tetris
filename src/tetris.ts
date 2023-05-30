@@ -1,5 +1,5 @@
 import {Shape} from "./shape";
-import {PlayfieldSize} from "./config";
+import { Coordinate, Playfield } from "./config";
 
 
 export class Tetris {
@@ -18,7 +18,7 @@ export class Tetris {
     /**
      *
      */
-    playfield: number[][] = [...Array(PlayfieldSize.Height)].map(e => Array(PlayfieldSize.Width).fill(0));
+    playfield: number[][] = [...Array(Playfield.Height)].map(e => Array(Playfield.Width).fill(0));
 
     /**
      * Current (active) shape.
@@ -29,6 +29,12 @@ export class Tetris {
      * Next shape.
      */
     nextShape: Shape;
+
+    getStartCoordinates(shape: Shape): Coordinate {
+        const x = ~~((this.playfield[0].length - shape.tetromino[0].length) / 2);
+
+        return [0, x];
+    }
 
     /**
      * Coordinate of active shape on playfield.

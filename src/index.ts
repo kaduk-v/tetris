@@ -1,7 +1,9 @@
 import './index.html';
 import './index.scss';
 import { Tetris } from "./tetris";
-import { ShapeI, ShapeO, ShapeT } from "./shape";
+import { ShapeI, ShapeJ, ShapeL, ShapeO, ShapeS, ShapeT } from "./shape";
+import { has2DMatrixElement, issetCoordinate } from "./helper";
+import { Color } from "./config";
 
 const root: HTMLElement = document.getElementById('root');
 const canvas: HTMLCanvasElement = document.createElement('canvas');
@@ -15,68 +17,45 @@ const ctx: CanvasRenderingContext2D = canvas.getContext('2d');
 //-----------
 
 const game = new Tetris();
+
 const t = new ShapeT();
 const i = new ShapeI();
 const o = new ShapeO();
+const s = new ShapeS();
+const j = new ShapeJ();
+const l = new ShapeL();
 
-const shape = t
+const shape = j;
 
 const render = () => {
-    const rows = game.playfield.length;
-    const cells = game.playfield[0].length;
+    const height = game.playfield.length;
+    const width = game.playfield[0].length;
 
+    const coordinates = game.getStartCoordinates(shape);
+    const { coor } = shape.getBlock(coordinates[1])
 
-    // get coordinates
-    // get real size
-    // check left/right/bottom
+    // column
+    for (let y = 0; y < height; y++) {
+        const coorY = y * 25;
 
-    const start = ~~((cells - shape.tetromino[0].length) / 2) - 1;
-    // shape.coordinates = [0, start];
+        // row
+        for (let x = 0; x < width; x++) {
+            const coorX = x * 25;
+            const piece = issetCoordinate(coor, y, x);
 
-    shape.rotate(2)
-    // shape.rotate()
-    // shape.rotate()
-    // shape.rotate()
+            // draw rectangle
+            ctx.fillStyle = piece ? Color.Red : Color.White;
+            ctx.fillRect(coorX, coorY, 25, 25);
 
-    console.log('shape tetromino: ' )
-    console.table( shape.tetromino )
-    console.log('shape size: ' );
-    console.table( shape.getBlock() )
-
-    for (let i = 0; i < rows; i++) {
-    }
-
-
-    for (const index in game.playfield) {
-        const row = game.playfield[index];
-        const y = +index * 25;
-
-        for (const rowEl in row) {
-            const piece = row[rowEl];
-            const x = +rowEl * 25;
-
-            ctx.fillStyle = piece ? "red" : 'white';
-            ctx.fillRect(x, y, 25, 25);
-
-            ctx.strokeStyle = piece ? "white" : 'gray';
-            ctx.lineWidth = 0.1;
-            ctx.strokeRect(x, y, 25, 25);
+            // draw rectangle border
+            ctx.strokeStyle = piece ? Color.White : Color.Blue;
+            ctx.lineWidth = 1;
+            ctx.strokeRect(coorX, coorY, 25, 25);
         }
     }
 }
 
-// console.table(game.playfield )
-
-
 render();
-
-// setInterval(()=> {
-//     render();
-//
-//     const row = game.playfield.pop();
-//     game.playfield.unshift(row)
-//
-// }, 1000)
 
 
 root.appendChild(canvas)
