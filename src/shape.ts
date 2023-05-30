@@ -1,10 +1,9 @@
 import { ShapeRotation } from "./config";
-import { map } from "lodash";
 
 /**
  * Two-dimensional matrix.
  */
-export type Tetromino = number[][];
+export type Matrix2D = number[][];
 
 export abstract class Shape {
     /**
@@ -12,42 +11,45 @@ export abstract class Shape {
      */
     abstract color: string;
 
-    abstract tetromino: Tetromino;
+    /**
+     * Geometric shape composed of four squares, connected orthogonally.
+     */
+    abstract tetromino: Matrix2D;
 
-    getSize() {
+    /**
+     * Real size of shape position (without empty pieces of tetromino).
+     */
+    getBlock(): Matrix2D {
         const rows = [];
-        const cells = [];
 
         for (let i = 0; i < this.tetromino.length; i++) {
-            const  passes = this.tetromino[i].some(el=>!!el);
+            const passes = this.tetromino[i].some(el => !!el);
 
             if (passes) {
                 rows.push(this.tetromino[i])
             }
         }
 
-        const res = rows.map((row)=> row.findIndex(el=> el===1))
-
-        const max=  Math.max(...res);
-        const min=  Math.min(...res);
+        const mins = rows.map((row) => row.findIndex(el => !!el))
+        const maxs = rows.map((row) => row.findLastIndex(el => !!el))
 
 
-        const shape = [];
-        for (let i = 0; i < rows.length ; i++) {
+        const max = Math.max(...maxs);
+        const min = Math.min(...mins);
+
+
+        const block = [];
+        for (let i = 0; i < rows.length; i++) {
             const row = [];
 
             for (let j = min; j <= max; j++) {
                 row.push(rows[i][j])
             }
 
-            shape.push(row)
-        } 
+            block.push(row)
+        }
 
-        return shape
-
-
-        // // calculate real size of current shape position (without empty pieces of tetromino)
-        // return [rows.length, Math.max(...res)]
+        return block;
     }
 
     /**
@@ -74,7 +76,7 @@ export abstract class Shape {
  */
 export class ShapeI extends Shape {
     color: string = '#41bef8';
-    tetromino: Tetromino = [
+    tetromino: Matrix2D = [
         [ 1, 1, 1, 1 ],
         [ 0, 0, 0, 0 ],
         [ 0, 0, 0, 0 ],
@@ -87,7 +89,7 @@ export class ShapeI extends Shape {
  */
 export class ShapeO extends Shape {
     color: string = '#ffff43';
-    tetromino: Tetromino = [
+    tetromino: Matrix2D = [
         [ 1, 1 ],
         [ 1, 1 ],
     ];
@@ -98,15 +100,11 @@ export class ShapeO extends Shape {
  */
 export class ShapeT extends Shape {
     color: string = '#7929f1';
-    tetromino: Tetromino = [
+    tetromino: Matrix2D = [
         [ 0, 1, 0 ],
         [ 1, 1, 1 ],
         [ 0, 0, 0 ],
     ];
-    coordinate =  0;
-    coordinates =  [0,0];
-
-
 }
 
 /**
@@ -114,7 +112,7 @@ export class ShapeT extends Shape {
  */
 class ShapeS extends Shape {
     color: string = '#11ea44';
-    tetromino: Tetromino = [
+    tetromino: Matrix2D = [
         [ 0, 0, 1, 1 ],
         [ 1, 1, 0, 0 ],
         [ 0, 0, 0, 0 ],
@@ -127,7 +125,7 @@ class ShapeS extends Shape {
  */
 class ShapeZ extends Shape {
     color: string = '#f30000';
-    tetromino: Tetromino = [
+    tetromino: Matrix2D = [
         [ 1, 1, 0, 0 ],
         [ 0, 0, 1, 1 ],
         [ 0, 0, 0, 0 ],
@@ -140,7 +138,7 @@ class ShapeZ extends Shape {
  */
 class ShapeJ extends Shape {
     color: string = '#0662ea';
-    tetromino: Tetromino = [
+    tetromino: Matrix2D = [
         [ 1, 0, 0, 0 ],
         [ 1, 1, 1, 1 ],
         [ 0, 0, 0, 0 ],
@@ -153,7 +151,7 @@ class ShapeJ extends Shape {
  */
 class ShapeL extends Shape {
     color: string = '#ea8706';
-    tetromino: Tetromino = [
+    tetromino: Matrix2D = [
         [ 0, 0, 0, 1 ],
         [ 1, 1, 1, 1 ],
         [ 0, 0, 0, 0 ],

@@ -19,6 +19,8 @@ const t = new ShapeT();
 const i = new ShapeI();
 const o = new ShapeO();
 
+const shape = t
+
 const render = () => {
     const rows = game.playfield.length;
     const cells = game.playfield[0].length;
@@ -28,23 +30,26 @@ const render = () => {
     // get real size
     // check left/right/bottom
 
-    const start = ~~((cells - o.tetromino[0].length) / 2) - 1;
-    t.coordinates = [0, start];
+    const start = ~~((cells - shape.tetromino[0].length) / 2) - 1;
+    // shape.coordinates = [0, start];
 
-    i.rotate()
-    i.rotate()
-    console.log('tetromino: ', i.tetromino )
-    console.log('size: ', i.getSize() )
+    shape.rotate(2)
+    // shape.rotate()
+    // shape.rotate()
+    // shape.rotate()
+
+    console.log('shape tetromino: ' )
+    console.table( shape.tetromino )
+    console.log('shape size: ' );
+    console.table( shape.getBlock() )
 
     for (let i = 0; i < rows; i++) {
     }
 
 
-
     for (const index in game.playfield) {
         const row = game.playfield[index];
         const y = +index * 25;
-
 
         for (const rowEl in row) {
             const piece = row[rowEl];
