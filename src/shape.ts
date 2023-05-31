@@ -1,4 +1,4 @@
-import { Color, Coordinate, ShapeRotation } from "./config";
+import { Color, Coordinate, MovementDirection, ShapeRotation } from "./config";
 
 /**
  * Two-dimensional matrix.
@@ -16,41 +16,37 @@ export abstract class Shape {
      */
     abstract tetromino: Matrix2D;
 
+    tetrominoStart: Coordinate = [0,0]
+
     /**
-     * Real size of shape position (without empty pieces of tetromino).
+     * Shape blocks coordinates on playfield.
      */
-    getBlock(offsetX: number) {
-        const rows = [];
-        const coor: Coordinate[] = [];
+    coordinates: Coordinate[];
 
-        // each row
-        for (let y = 0; y < this.tetromino.length; y++) {
-            const passes = this.tetromino[y].some(el => !!el);
-
-            if (passes) {
-                this.tetromino[y].map((el: number, x: number): number => (el === 1) ? coor.push([ y, x + offsetX ]) : null);
-                rows.push(this.tetromino[y])
-            }
+    /**
+     * Fetch new shape coordinates according to movement direction.
+     *
+     * @param [direction] - Shape movement direction.
+     */
+    move(direction: MovementDirection): Coordinate[] {
+        if (!this.coordinates.length) {
+            throw new Error('Shape doesnt have coordinates');
         }
 
-        const mins = rows.map((row) => row.findIndex(el => !!el))
-        const maxs = rows.map((row) => row.findLastIndex(el => !!el))
+        return this.coordinates.map(coordinate => {
+            const [ y, x ] = coordinate;
 
-        const max = Math.max(...maxs);
-        const min = Math.min(...mins);
+            switch (direction) {
+                case MovementDirection.Left:
+                    return [ y, x - 1 ];
 
-        const block = [];
-        for (let i = 0; i < rows.length; i++) {
-            const row = [];
+                case MovementDirection.Right:
+                    return [ y, x + 1 ];
 
-            for (let j = min; j <= max; j++) {
-                row.push(rows[i][j])
+                case MovementDirection.Down:
+                    return [ y + 1, x ];
             }
-
-            block.push(row)
-        }
-
-        return { coor, block };
+        });
     }
 
     /**
@@ -68,6 +64,56 @@ export abstract class Shape {
         }
 
         throw new Error('Cannot rotate shape. Unsupported shape rotation');
+    }
+
+    /**
+     * Update shape coordinates on playfield.
+     *
+     * @param [offsetY]
+     * @param [offsetX]
+     */
+    setCoordinates(offsetY: number = 0, offsetX: number = 0) {
+        const tetromino: Coordinate[] = [];
+        const coordinates: Coordinate[] = [];
+
+
+        // iterate rows
+        for (let y = 0; y < this.tetromino.length; y++) {
+            const hasRowPiece = this.tetromino[y].some(piece => piece === 1);
+
+            if (!hasRowPiece) {
+                continue;
+                // rows.push(this.tetromino[y])
+            }
+
+            // iterate row cells
+            for (let x = 0; x < this.tetromino[y].length; x++) {
+                const piece = this.tetromino[y][x];
+
+                if (piece === 1) {
+                    coordinates.push([ y + offsetY, x + offsetX ]);
+                }
+            }
+        }
+
+        // const mins = rows.map((row) => row.findIndex(el => !!el))
+        // const maxs = rows.map((row) => row.findLastIndex(el => !!el))
+        //
+        // const max = Math.max(...maxs);
+        // const min = Math.min(...mins);
+        //
+        // const block = [];
+        // for (let i = 0; i < rows.length; i++) {
+        //     const row = [];
+        //
+        //     for (let j = min; j <= max; j++) {
+        //         row.push(rows[i][j])
+        //     }
+        //
+        //     block.push(row)
+        // }
+
+        this.coordinates = coordinates;
     }
 }
 

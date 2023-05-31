@@ -1,3 +1,4 @@
-class Tetromino {
-    
+class Coordinate {
+    current: [];
+    history: [];
 }

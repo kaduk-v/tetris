@@ -4,7 +4,7 @@
  */
 export type Coordinate = [ number, number ];
 
-export enum ShapeOrientation {
+export enum MovementDirection {
     Up,
     Right,
     Left,

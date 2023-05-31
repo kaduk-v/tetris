@@ -29,40 +29,14 @@ const dot = new ShapeDot();
 const x = new ShapeX();
 const u = new ShapeU();
 
-const shape = t;
+const shape = i;
 
 game.shape = shape;
 
-const render = () => {
-    const height = game.playfield.length;
-    const width = game.playfield[0].length;
+game.render(true);
 
-    const coordinates = game.getStartCoordinates(shape);
-    const { coor } = shape.getBlock(coordinates[1])
-
-    // column
-    for (let y = 0; y < height; y++) {
-        const coorY = y * 25;
-
-        // row
-        for (let x = 0; x < width; x++) {
-            const coorX = x * 25;
-            const piece = issetCoordinate(coor, y, x);
-
-            // draw rectangle
-            ctx.fillStyle = piece ? Color.Red : Color.White;
-            ctx.fillRect(coorX, coorY, 25, 25);
-
-            // draw rectangle border
-            ctx.strokeStyle = piece ? Color.White : Color.Blue;
-            ctx.lineWidth = 1;
-            ctx.strokeRect(coorX, coorY, 25, 25);
-        }
-    }
-}
+// @ts-ignore
+window.game = game
 
 
-render();
 
-
-root.appendChild(canvas)
