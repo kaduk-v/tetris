@@ -43,77 +43,13 @@ export class Tetris {
         this.initCanvas();
     }
 
-    moveRight() {
-        const newCoordinates: Coordinate[] = this.shape.move(MovementDirection.Right);
-
-        // todo: get next coord
-        // todo: check right wall/shape
-
-        const canMoved = this.isCoordinateAvailable(this.shape.coordinates);
-
-        console.log('canMoved: ', canMoved )
+    moveShape(direction: MovementDirection) {
+        const newCoordinates: Coordinate[] = this.shape.move(direction);
+        const canMoved: boolean = this.isCoordinateAvailable(newCoordinates);
 
         if (canMoved) {
             this.shape.coordinates = newCoordinates;
             this.render();
-        }
-    }
-
-    moveLeft() {
-        this.shape.coordinates = this.shape.coordinates.map(coordinate => {
-            const [ y, x ] = coordinate;
-
-            return [ y, x - 1 ]
-        })
-
-        this.render();
-    }
-
-    moveDown() {
-        this.shape.coordinates = this.shape.coordinates.map(coordinate => {
-            const [ y, x ] = coordinate;
-
-            return [ y + 1, x ]
-        })
-
-        this.render();
-    }
-
-    getStartXCoordinate(): number {
-        return ~~((this.playfield[0].length - this.shape.tetromino[0].length) / 2);
-    }
-
-    render(f = false) {
-        const height = this.playfield.length;
-        const width = this.playfield[0].length;
-
-        if (f) {
-            const coordinateX = this.getStartXCoordinate();
-
-            this.shape.tetrominoStart = [ 0, coordinateX ];
-
-            this.shape.setCoordinates(0, coordinateX);
-        }
-
-
-        // column
-        for (let y = 0; y < height; y++) {
-            const coorY = y * 25;
-
-            // row
-            for (let x = 0; x < width; x++) {
-                const coorX = x * 25;
-                const isPiece = issetCoordinate(this.shape.coordinates, y, x);
-
-                // draw rectangle
-                this.context.fillStyle = isPiece ? Color.Red : Color.White;
-                this.context.fillRect(coorX, coorY, 25, 25);
-
-                // draw rectangle border
-                this.context.strokeStyle = isPiece ? Color.White : Color.Blue;
-                this.context.lineWidth = 1;
-                this.context.strokeRect(coorX, coorY, 25, 25);
-            }
         }
     }
 
@@ -123,23 +59,58 @@ export class Tetris {
         this.render()
     }
 
+    render(isStart = false) {
+        const height = this.playfield.length;
+        const width = this.playfield[0].length;
+
+        if (isStart) {
+            const coordinateX = this.getStartXCoordinate();
+
+            this.shape.tetrominoStart = [ 0, coordinateX ];
+            this.shape.setCoordinates(0, coordinateX);
+        }
+
+        // rows
+        for (let y = 0; y < Playfield.Height; y++) {
+            const coorY = y * Playfield.BlockSide;
+
+            // row cells
+            for (let x = 0; x < Playfield.Width; x++) {
+                const coorX = x * Playfield.BlockSide;
+                const isPiece = issetCoordinate(this.shape.coordinates, y, x);
+
+                // draw rectangle
+                this.context.fillStyle = isPiece ? this.shape.color : Color.White;
+                this.context.fillRect(coorX, coorY, Playfield.BlockSide, Playfield.BlockSide);
+
+                // draw rectangle border
+                this.context.strokeStyle = isPiece ? Color.White : Color.Blue;
+                this.context.lineWidth = isPiece ? 1 : Playfield.LineWidth;
+                this.context.strokeRect(coorX, coorY, Playfield.BlockSide, Playfield.BlockSide);
+            }
+        }
+    }
+
+    getStartXCoordinate(): number {
+        return ~~((this.playfield[0].length - this.shape.tetromino[0].length) / 2);
+    }
+
     initEvents() {
         document.addEventListener("keydown", (e: KeyboardEvent) => {
             switch (e.code) {
                 case Key.Left:
                 case Key.A:
-                    this.moveLeft();
+                    this.moveShape(MovementDirection.Left);
                     break;
 
                 case Key.Right:
                 case Key.D:
-                    this.moveRight();
-
+                    this.moveShape(MovementDirection.Right);
                     break;
 
                 case Key.Down:
                 case Key.S:
-                    this.moveDown();
+                    this.moveShape(MovementDirection.Down);
                     break;
 
                 case Key.Up:
@@ -158,8 +129,8 @@ export class Tetris {
         const root: HTMLElement = document.getElementById('root');
         const canvas: HTMLCanvasElement = document.createElement('canvas');
 
-        canvas.height = 300;
-        canvas.width = 300;
+        canvas.height = Playfield.Height * Playfield.BlockSide;
+        canvas.width = Playfield.Width * Playfield.BlockSide;
 
         this.context = canvas.getContext('2d');
 

@@ -76,14 +76,12 @@ export abstract class Shape {
         const tetromino: Coordinate[] = [];
         const coordinates: Coordinate[] = [];
 
-
         // iterate rows
         for (let y = 0; y < this.tetromino.length; y++) {
             const hasRowPiece = this.tetromino[y].some(piece => piece === 1);
 
             if (!hasRowPiece) {
                 continue;
-                // rows.push(this.tetromino[y])
             }
 
             // iterate row cells
@@ -95,23 +93,6 @@ export abstract class Shape {
                 }
             }
         }
-
-        // const mins = rows.map((row) => row.findIndex(el => !!el))
-        // const maxs = rows.map((row) => row.findLastIndex(el => !!el))
-        //
-        // const max = Math.max(...maxs);
-        // const min = Math.min(...mins);
-        //
-        // const block = [];
-        // for (let i = 0; i < rows.length; i++) {
-        //     const row = [];
-        //
-        //     for (let j = min; j <= max; j++) {
-        //         row.push(rows[i][j])
-        //     }
-        //
-        //     block.push(row)
-        // }
 
         this.coordinates = coordinates;
     }
@@ -184,10 +165,9 @@ export class ShapeZ extends Shape {
 export class ShapeJ extends Shape {
     color: Color = Color.Blue;
     tetromino: Matrix2D = [
-        [ 1, 0, 0, 0 ],
-        [ 1, 1, 1, 1 ],
-        [ 0, 0, 0, 0 ],
-        [ 0, 0, 0, 0 ],
+        [ 1, 0, 0 ],
+        [ 1, 1, 1 ],
+        [ 0, 0, 0 ],
     ];
 }
 
@@ -197,10 +177,9 @@ export class ShapeJ extends Shape {
 export class ShapeL extends Shape {
     color: string = Color.Orange;
     tetromino: Matrix2D = [
-        [ 0, 0, 0, 1 ],
-        [ 1, 1, 1, 1 ],
-        [ 0, 0, 0, 0 ],
-        [ 0, 0, 0, 0 ],
+        [ 0, 0, 1 ],
+        [ 1, 1, 1 ],
+        [ 0, 0, 0 ],
     ];
 }
 

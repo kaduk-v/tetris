@@ -29,7 +29,7 @@ const dot = new ShapeDot();
 const x = new ShapeX();
 const u = new ShapeU();
 
-const shape = i;
+const shape = l;
 
 game.shape = shape;
 

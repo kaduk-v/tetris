@@ -34,8 +34,8 @@ export enum ShapeRotation {
 export enum Playfield {
     Width = 10,
     Height = 20,
-    LineHeight = 0.1,
-    ShapeBlockSize = 25, // 25px
+    LineWidth = 0.1, // block stroke
+    BlockSide = 25, // 25px
     MovementSpeed = 1000 // 1 sec
 }
 
