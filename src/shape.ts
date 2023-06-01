@@ -5,6 +5,12 @@ import { Color, Coordinate, MovementDirection, Playfield, ShapeRotation } from "
  */
 export type Matrix2D = number[][];
 
+export type GridItem = {
+    color: Color,
+    filled: boolean
+}
+export type GridMatrix2D = GridItem[][];
+
 export abstract class Shape {
     /**
      * Shape color.

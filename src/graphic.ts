@@ -72,6 +72,10 @@ class Graphic {
         Graphic.context.lineWidth = Playfield.LineWidth;
         Graphic.context.strokeRect(x, y, targetBlock.width, targetBlock.height);
     }
+
+    public static clearPlayfield() {
+        Graphic.context.clearRect(0, 0, Playfield.Width * Playfield.BlockSide, Playfield.Height * Playfield.BlockSide);
+    }
 }
 
 Graphic.getInstance();
