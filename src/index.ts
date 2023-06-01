@@ -21,7 +21,7 @@ const dot = new ShapeDot();
 const x = new ShapeX();
 const u = new ShapeU();
 
-game.shape = l;
+game.shape = t;
 
 game.render();
 game.start();

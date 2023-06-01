@@ -1,5 +1,5 @@
 import { Matrix2D, Shape } from "./shape";
-import { Color, Coordinate, Key, MovementDirection, Playfield } from "./config";
+import { Color, Coordinate, Key, MovementDirection, Playfield, ShapeRotation } from "./config";
 import { hasMatrix2DElement } from "./helper";
 import { Graphic } from "./graphic";
 
@@ -42,15 +42,24 @@ export class Tetris {
 
         if (canMoved) {
             this.clearShape();
+            this.shape.offsetTetromino(direction);
             this.shape.coordinates = newCoordinates;
             this.drawShape();
         }
     }
 
     rotateShape() {
+        this.clearShape()
         this.shape.rotate();
-        this.shape.setCoordinates()
-        this.render()
+
+        const canRotate: boolean = this.isCoordinateAvailable(this.shape.coordinates);
+
+        if (!canRotate) {
+            // rollback
+            this.shape.rotate(ShapeRotation.CounterClockwise);
+        }
+
+        this.drawShape();
     }
 
     drawShape() {
@@ -61,8 +70,7 @@ export class Tetris {
     }
 
     clearShape() {
-        this.shape.coordinates.map(coordinate => Graphic.draw(coordinate, {
-            color: Color.White,
+        this.shape.coordinates.map(coordinate => Graphic.clear(coordinate, {
             borderColor: Color.Gray
         }));
     }
@@ -100,7 +108,7 @@ export class Tetris {
         const coordinateX = this.getStartXCoordinate();
 
         this.shape.tetrominoStart = [ 0, coordinateX ];
-        this.shape.setCoordinates(0, coordinateX);
+        this.shape.updateCoordinates(0, coordinateX);
 
         this.drawShape();
         this.initControls();

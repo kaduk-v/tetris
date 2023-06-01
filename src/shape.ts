@@ -1,4 +1,4 @@
-import { Color, Coordinate, MovementDirection, ShapeRotation } from "./config";
+import { Color, Coordinate, MovementDirection, Playfield, ShapeRotation } from "./config";
 
 /**
  * Two-dimensional matrix.
@@ -16,7 +16,7 @@ export abstract class Shape {
      */
     abstract tetromino: Matrix2D;
 
-    tetrominoStart: Coordinate = [0,0];
+    tetrominoStart: Coordinate = [ 0, 0 ];
 
     /**
      * Shape blocks coordinates on playfield.
@@ -53,52 +53,88 @@ export abstract class Shape {
      *  Rotate a 2 dimensional matrix 90 degrees.
      */
     rotate(rotation: ShapeRotation = ShapeRotation.Clockwise): void {
+        const [ offsetY, offsetX ] = this.tetrominoStart;
+
+
+        console.log('LOG: ', [ offsetY, offsetX ] )
+
         switch (rotation) {
             case ShapeRotation.CounterClockwise:
                 this.tetromino = this.tetromino[0].map((val, index) => this.tetromino.map(row => row[row.length - 1 - index]));
-                return;
+                this.updateCoordinates(offsetY, offsetX);
 
+                return;
             case ShapeRotation.Clockwise:
                 this.tetromino = this.tetromino.map((val, index) => this.tetromino.map(row => row[index]).reverse());
+                this.updateCoordinates(offsetY, offsetX);
+
                 return;
         }
 
         throw new Error('Cannot rotate shape. Unsupported shape rotation');
     }
 
-    // draw(playfield) {
-    //
-    // }
-
     /**
      * Update shape coordinates on playfield.
      *
-     * @param [offsetY]
-     * @param [offsetX]
+     * @param [offsetY] - Offset shape down.
+     * @param [offsetX] - Offset shape right.
      */
-    setCoordinates(offsetY: number = 0, offsetX: number = 0) {
-        const tetromino: Coordinate[] = [];
+    updateCoordinates(offsetY: number = 0, offsetX: number = 0) {
         const coordinates: Coordinate[] = [];
 
         // iterate rows
         for (let y = 0; y < this.tetromino.length; y++) {
-            const hasRowPiece = this.tetromino[y].some(piece => piece === 1);
+            const hasRowBlock = this.tetromino[y].some(block => block === 1);
 
-            if (!hasRowPiece) {
+            if (!hasRowBlock) {
                 continue;
             }
 
             // iterate row cells
             for (let x = 0; x < this.tetromino[y].length; x++) {
-                const piece = this.tetromino[y][x];
+                const block = this.tetromino[y][x];
 
-                if (piece === 1) {
+                if (block === 1) {
                     coordinates.push([ y + offsetY, x + offsetX ]);
                 }
             }
         }
 
         this.coordinates = coordinates;
+    }
+
+    offsetTetromino(direction: MovementDirection): void {
+        const [ y, x ] = this.tetrominoStart;
+
+        // reflection symmetry
+        const horizontal = this.tetromino[0].length;
+        const vertical = this.tetromino.length;
+
+        // playfield size
+        const w = Playfield.Width - horizontal;
+        const h = Playfield.Height - vertical;
+
+        switch (direction) {
+            case MovementDirection.Left:
+                if (x - 1 >= 0) {
+                    this.tetrominoStart = [ y, x - 1 ];
+                }
+
+                break;
+            case MovementDirection.Right:
+                if (x + 1 <= w) {
+                    this.tetrominoStart = [ y, x + 1 ];
+                }
+
+                break;
+            case MovementDirection.Down:
+                if (y + 1 <= h) {
+                    this.tetrominoStart = [ y + 1, x ];
+                }
+
+                break;
+        }
     }
 }
 

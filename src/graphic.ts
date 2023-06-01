@@ -49,11 +49,28 @@ class Graphic {
         Graphic.context.fillStyle = targetBlock.color;
         Graphic.context.fillRect(x, y, targetBlock.width, targetBlock.height);
 
+        // Graphic.context.clearRect(x, y, 1, 1);
+
         // draw rectangle border
         Graphic.context.strokeStyle = targetBlock.borderColor;
         Graphic.context.lineWidth = Playfield.LineWidth;
         Graphic.context.strokeRect(x, y, targetBlock.width, targetBlock.height);
 
+    }
+
+    public static clear(coordinate: Coordinate, block: PlayfieldBlock) {
+        const x = coordinate[1] * Playfield.BlockSide;
+        const y = coordinate[0] * Playfield.BlockSide;
+
+        const targetBlock = { ...defaultBlock, ...block };
+
+        // clear rectangle
+        Graphic.context.clearRect(x, y, targetBlock.width, targetBlock.height);
+
+        // draw rectangle border
+        Graphic.context.strokeStyle = targetBlock.borderColor;
+        Graphic.context.lineWidth = Playfield.LineWidth;
+        Graphic.context.strokeRect(x, y, targetBlock.width, targetBlock.height);
     }
 }
 
