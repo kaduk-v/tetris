@@ -1,4 +1,4 @@
-import { Color, Coordinate, MovementDirection, ShapeRotation } from "./config";
+import { Color, Coordinate, MovementDirection, ShapeRotation } from "@src/config";
 
 /**
  * Two-dimensional matrix.
@@ -65,6 +65,10 @@ export abstract class Shape {
 
         throw new Error('Cannot rotate shape. Unsupported shape rotation');
     }
+
+    // draw(playfield) {
+    //
+    // }
 
     /**
      * Update shape coordinates on playfield.

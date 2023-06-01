@@ -1,14 +1,22 @@
 {
   "compilerOptions": {
-    "outDir": "./dist/",
+    "outDir": "./dist",
+    "rootDir": "./src",
     "noImplicitAny": true,
+    "resolveJsonModule": true,
     "module": "es6",
     "lib": [
       "esnext",
       "dom"
     ],
+    "typeRoots": [
+      "./node_modules/@types"
+    ],
+    "paths": {
+      "@src/*": [ "./src/*" ],
+    },
     "target": "es5",
-    "allowJs": true,
+    "allowJs": false,
     "moduleResolution": "node"
   }
 }

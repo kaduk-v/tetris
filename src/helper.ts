@@ -1,5 +1,5 @@
-import { Matrix2D } from "./shape";
-import { Coordinate } from "./config";
+import { Matrix2D } from "@src/shape";
+import { Coordinate } from "@src/config";
 
 export const hasMatrix2DElement = (matrix: Matrix2D, row: number, col: number): boolean => {
     return matrix[row] !== undefined && matrix[row][col] !== undefined;

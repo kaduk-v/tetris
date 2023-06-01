@@ -1,20 +1,7 @@
-import './index.html';
-import './index.scss';
-import { Tetris } from "./tetris";
-import { ShapeDot, ShapeI, ShapeJ, ShapeL, ShapeO, ShapeS, ShapeT, ShapeU, ShapeX } from "./shape";
-import { hasMatrix2DElement, issetCoordinate } from "./helper";
-import { Color, Key } from "./config";
-
-const root: HTMLElement = document.getElementById('root');
-const canvas: HTMLCanvasElement = document.createElement('canvas');
-
-canvas.height = 300;
-canvas.width = 300;
-
-const ctx: CanvasRenderingContext2D = canvas.getContext('2d');
-
-
-//-----------
+import '@src/index.html';
+import '@src/index.scss';
+import { Tetris } from "@src/tetris";
+import { ShapeDot, ShapeI, ShapeJ, ShapeL, ShapeO, ShapeS, ShapeT, ShapeU, ShapeX } from "@src/shape";
 
 const game = new Tetris();
 
@@ -29,9 +16,7 @@ const dot = new ShapeDot();
 const x = new ShapeX();
 const u = new ShapeU();
 
-const shape = l;
-
-game.shape = shape;
+game.shape = l;
 
 game.render(true);
 

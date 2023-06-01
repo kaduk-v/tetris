@@ -1,6 +1,6 @@
-import { Matrix2D, Shape } from "./shape";
-import { Color, Coordinate, Key, MovementDirection, Playfield } from "./config";
-import { hasMatrix2DElement, issetCoordinate } from "./helper";
+import { Matrix2D, Shape } from "@src/shape";
+import { Color, Coordinate, Key, MovementDirection, Playfield } from "@src/config";
+import { hasMatrix2DElement, issetCoordinate } from "@src/helper";
 
 
 // todo: game state
@@ -60,8 +60,6 @@ export class Tetris {
     }
 
     render(isStart = false) {
-        const height = this.playfield.length;
-        const width = this.playfield[0].length;
 
         if (isStart) {
             const coordinateX = this.getStartXCoordinate();
@@ -91,6 +89,9 @@ export class Tetris {
         }
     }
 
+    /**
+     * Calculate centre of Y axis (first row).
+     */
     getStartXCoordinate(): number {
         return ~~((this.playfield[0].length - this.shape.tetromino[0].length) / 2);
     }
