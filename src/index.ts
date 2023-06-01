@@ -1,7 +1,12 @@
-import '@src/index.html';
-import '@src/index.scss';
-import { Tetris } from "@src/tetris";
-import { ShapeDot, ShapeI, ShapeJ, ShapeL, ShapeO, ShapeS, ShapeT, ShapeU, ShapeX } from "@src/shape";
+import './index.html';
+import './index.scss';
+import { Graphic } from "./graphic";
+import { ShapeDot, ShapeI, ShapeJ, ShapeL, ShapeO, ShapeS, ShapeT, ShapeU, ShapeX } from "./shape";
+import { Tetris } from "./tetris";
+import { Color, Playfield } from "./config";
+
+const root: HTMLElement = document.getElementById('root');
+root.appendChild(Graphic.canvas);
 
 const game = new Tetris();
 
@@ -18,10 +23,5 @@ const u = new ShapeU();
 
 game.shape = l;
 
-game.render(true);
-
-// @ts-ignore
-window.game = game
-
-
-
+game.render();
+game.start();

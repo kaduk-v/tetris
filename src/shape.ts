@@ -1,4 +1,4 @@
-import { Color, Coordinate, MovementDirection, ShapeRotation } from "@src/config";
+import { Color, Coordinate, MovementDirection, ShapeRotation } from "./config";
 
 /**
  * Two-dimensional matrix.
@@ -9,14 +9,14 @@ export abstract class Shape {
     /**
      * Shape color.
      */
-    abstract color: string;
+    abstract color: Color;
 
     /**
      * Geometric shape composed of four squares, connected orthogonally.
      */
     abstract tetromino: Matrix2D;
 
-    tetrominoStart: Coordinate = [0,0]
+    tetrominoStart: Coordinate = [0,0];
 
     /**
      * Shape blocks coordinates on playfield.
@@ -179,7 +179,7 @@ export class ShapeJ extends Shape {
  * A row of three Minos with one added above the right side. Shaped like a capital L.
  */
 export class ShapeL extends Shape {
-    color: string = Color.Orange;
+    color: Color = Color.Orange;
     tetromino: Matrix2D = [
         [ 0, 0, 1 ],
         [ 1, 1, 1 ],
@@ -190,14 +190,14 @@ export class ShapeL extends Shape {
 
 // TODO: additional shapes
 export class ShapeDot extends Shape {
-    color: string = '#ea8706';
+    color: Color = Color.Orange;
     tetromino: Matrix2D = [
         [ 1 ],
     ];
 }
 
 export class ShapeX extends Shape {
-    color: string = '#ea8706';
+    color: Color = Color.Orange;
     tetromino: Matrix2D = [
         [ 0, 1, 0 ],
         [ 1, 1, 1 ],
@@ -206,7 +206,7 @@ export class ShapeX extends Shape {
 }
 
 export class ShapeU extends Shape {
-    color: string = '#ea8706';
+    color: Color = Color.Orange;
     tetromino: Matrix2D = [
         [ 1, 0, 1 ],
         [ 1, 1, 1 ],

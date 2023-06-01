@@ -1,10 +1,8 @@
-import { Matrix2D, Shape } from "@src/shape";
-import { Color, Coordinate, Key, MovementDirection, Playfield } from "@src/config";
-import { hasMatrix2DElement, issetCoordinate } from "@src/helper";
+import { Matrix2D, Shape } from "./shape";
+import { Color, Coordinate, Key, MovementDirection, Playfield } from "./config";
+import { hasMatrix2DElement } from "./helper";
+import { Graphic } from "./graphic";
 
-
-// todo: game state
-// todo: game controls
 
 export class Tetris {
     /**
@@ -16,6 +14,7 @@ export class Tetris {
      * Game level.
      */
     level = 1;
+
     topScore = 0;
     lines = 0;
 
@@ -26,7 +25,6 @@ export class Tetris {
 
     playfield: Matrix2D = [ ...Array(Playfield.Height) ].map(e => Array(Playfield.Width).fill(0));
 
-    context: CanvasRenderingContext2D
 
     /**
      * Current (active) shape.
@@ -38,18 +36,14 @@ export class Tetris {
      */
     nextShape: Shape;
 
-    constructor() {
-        this.initEvents();
-        this.initCanvas();
-    }
-
     moveShape(direction: MovementDirection) {
         const newCoordinates: Coordinate[] = this.shape.move(direction);
         const canMoved: boolean = this.isCoordinateAvailable(newCoordinates);
 
         if (canMoved) {
+            this.clearShape();
             this.shape.coordinates = newCoordinates;
-            this.render();
+            this.drawShape();
         }
     }
 
@@ -59,34 +53,57 @@ export class Tetris {
         this.render()
     }
 
-    render(isStart = false) {
+    drawShape() {
+        this.shape.coordinates.map(coordinate => Graphic.draw(coordinate, {
+            color: this.shape.color,
+            borderColor: Color.White
+        }));
+    }
 
-        if (isStart) {
-            const coordinateX = this.getStartXCoordinate();
+    clearShape() {
+        this.shape.coordinates.map(coordinate => Graphic.draw(coordinate, {
+            color: Color.White,
+            borderColor: Color.Gray
+        }));
+    }
 
-            this.shape.tetrominoStart = [ 0, coordinateX ];
-            this.shape.setCoordinates(0, coordinateX);
-        }
+    highlightLine() {
+        const width = Playfield.Width * 25
 
-        // rows
+
+        setInterval(() => {
+            for (let i = 0; i < Playfield.Height; i++) {
+                Graphic.draw([ 4, i ], { width, color: Color.Purple, borderColor: Color.White })
+            }
+        }, 800)
+
+        setInterval(() => {
+            for (let i = 0; i < Playfield.Height; i++) {
+                Graphic.draw([ 4, i ], { width, color: Color.White, borderColor: Color.Gray })
+            }
+        }, 900)
+
+    }
+
+    render() {
+        // draw playfield
         for (let y = 0; y < Playfield.Height; y++) {
-            const coorY = y * Playfield.BlockSide;
-
-            // row cells
             for (let x = 0; x < Playfield.Width; x++) {
-                const coorX = x * Playfield.BlockSide;
-                const isPiece = issetCoordinate(this.shape.coordinates, y, x);
-
-                // draw rectangle
-                this.context.fillStyle = isPiece ? this.shape.color : Color.White;
-                this.context.fillRect(coorX, coorY, Playfield.BlockSide, Playfield.BlockSide);
-
-                // draw rectangle border
-                this.context.strokeStyle = isPiece ? Color.White : Color.Blue;
-                this.context.lineWidth = isPiece ? 1 : Playfield.LineWidth;
-                this.context.strokeRect(coorX, coorY, Playfield.BlockSide, Playfield.BlockSide);
+                Graphic.draw([ y, x ], { color: Color.White, borderColor: Color.Gray });
             }
         }
+
+        // todo: draw side panel
+    }
+
+    start() {
+        const coordinateX = this.getStartXCoordinate();
+
+        this.shape.tetrominoStart = [ 0, coordinateX ];
+        this.shape.setCoordinates(0, coordinateX);
+
+        this.drawShape();
+        this.initControls();
     }
 
     /**
@@ -96,7 +113,7 @@ export class Tetris {
         return ~~((this.playfield[0].length - this.shape.tetromino[0].length) / 2);
     }
 
-    initEvents() {
+    initControls() {
         document.addEventListener("keydown", (e: KeyboardEvent) => {
             switch (e.code) {
                 case Key.Left:
@@ -124,18 +141,6 @@ export class Tetris {
                     break;
             }
         });
-    }
-
-    initCanvas() {
-        const root: HTMLElement = document.getElementById('root');
-        const canvas: HTMLCanvasElement = document.createElement('canvas');
-
-        canvas.height = Playfield.Height * Playfield.BlockSide;
-        canvas.width = Playfield.Width * Playfield.BlockSide;
-
-        this.context = canvas.getContext('2d');
-
-        root.appendChild(canvas);
     }
 
     /**

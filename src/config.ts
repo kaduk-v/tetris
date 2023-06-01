@@ -1,8 +1,15 @@
 /**
- * Y-Axis. First element.
- * X-Axis. Second element.
+ * @param [number] Y-Axis. First element.
+ * @param [number] X-Axis. Second element.
  */
 export type Coordinate = [ number, number ];
+
+export interface PlayfieldBlock {
+    color?: Color;
+    width?: number;
+    height?: number;
+    borderColor?: Color;
+}
 
 export enum MovementDirection {
     Up,
@@ -42,6 +49,7 @@ export enum Playfield {
 export enum Color {
     Blue = '#0662ea',
     Green = '#37ab0c',
+    Gray = '#535360',
     LightBlue = '#41bef8',
     Purple = '#7929f1',
     Orange = '#ea8706',
@@ -49,5 +57,6 @@ export enum Color {
     White = '#ffffff',
     Yellow = '#ffff43',
 }
+
 
 

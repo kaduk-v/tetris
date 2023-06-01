@@ -9,12 +9,6 @@
       "esnext",
       "dom"
     ],
-    "typeRoots": [
-      "./node_modules/@types"
-    ],
-    "paths": {
-      "@src/*": [ "./src/*" ],
-    },
     "target": "es5",
     "allowJs": false,
     "moduleResolution": "node"
