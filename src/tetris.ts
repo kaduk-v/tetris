@@ -247,6 +247,10 @@ export class Tetris {
         // add new lines at the beginning instead of deleted ones
         this.playfield.unshift(...playfield);
         this.grid.unshift(...grid);
+
+        if (this.playfield.length !== Playfield.Height) {
+            throw new Error('Incorrect remove lines');
+        }
     }
 
     /**

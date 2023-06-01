@@ -56,13 +56,10 @@ export abstract class Shape {
     }
 
     /**
-     *  Rotate a 2 dimensional matrix 90 degrees.
+     * Rotate a 2 dimensional matrix 90 degrees.
      */
     rotate(rotation: ShapeRotation = ShapeRotation.Clockwise): void {
         const [ offsetY, offsetX ] = this.tetrominoStart;
-
-
-        console.log('LOG: ', [ offsetY, offsetX ] )
 
         switch (rotation) {
             case ShapeRotation.CounterClockwise:
