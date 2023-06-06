@@ -159,7 +159,7 @@ export class ShapeI extends Shape {
  * Square shape. Shaped like a capital O.
  */
 export class ShapeO extends Shape {
-    color: Color = Color.Yellow;
+    color: Color = Color.Pink;
     tetromino: Matrix2D = [
         [ 1, 1 ],
         [ 1, 1 ],

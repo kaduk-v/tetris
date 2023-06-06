@@ -1,5 +1,5 @@
 import { GridMatrix2D, Matrix2D, Shape, ShapeI, ShapeJ, ShapeL, ShapeO, ShapeS, ShapeT } from "./shape";
-import { Color, Coordinate, Key, Direction, Playfield, ShapeRotation } from "./config";
+import { Color, Coordinate, Direction, Key, Playfield, Score, ShapeRotation } from "./config";
 import { hasMatrix2DElement, random } from "./helper";
 import { Graphic } from "./graphic";
 import { IntervalTimer } from "./interval-timer";
@@ -26,7 +26,7 @@ export class Tetris {
      * Playfield to render.
      */
     grid: GridMatrix2D = [ ...Array(Playfield.Height) ].map(e => Array(Playfield.Width).fill({
-        color: Color.White,
+        color: Color.LightGray,
         filled: false
     }));
 
@@ -53,8 +53,6 @@ export class Tetris {
 
     public init() {
         this.drawPlayfield();
-
-        // todo: draw side panel
 
         this.shape = this.getRandomShape();
         this.nextShape = this.getRandomShape();
@@ -142,14 +140,11 @@ export class Tetris {
     private drawShape() {
         this.shape.coordinates.map(coordinate => Graphic.draw(coordinate, {
             color: this.shape.color,
-            borderColor: Color.White
         }));
     }
 
     private clearShape() {
-        this.shape.coordinates.map(coordinate => Graphic.clear(coordinate, {
-            borderColor: Color.Gray
-        }));
+        this.shape.coordinates.map(coordinate => Graphic.clear(coordinate));
     }
 
     private drawPlayfield() {
@@ -196,6 +191,8 @@ export class Tetris {
                 filled: true
             };
         });
+
+        this.updateScore();
     }
 
     private processLines() {
@@ -211,10 +208,6 @@ export class Tetris {
             return;
         }
 
-        // todo: update score
-        this.score += 10;
-        this.lines += lines.length;
-
         // update playfield grid state
         lines.forEach((line) => {
             this.grid[line] = this.grid[line].map(cell => {
@@ -222,10 +215,10 @@ export class Tetris {
                     color: Color.Gray,
                     filled: true
                 }
-            })
+            });
         });
 
-        // todo: use promise to blink lines
+        this.updateLines(lines.length);
 
         // re-draw playfield
         this.drawPlayfield();
@@ -258,7 +251,7 @@ export class Tetris {
 
             const playfield: Matrix2D = [ ...Array(1) ].map(e => Array(Playfield.Width).fill(0));
             const grid: GridMatrix2D = [ ...Array(1) ].map(e => Array(Playfield.Width).fill({
-                color: Color.White,
+                color: Color.LightGray,
                 filled: false
             }));
 
@@ -328,5 +321,19 @@ export class Tetris {
         }
 
         return available.filter(available => available).length === coordinates.length;
+    }
+
+    private updateScore() {
+        this.score += Score.Shape;
+
+        Graphic.score.textContent = this.score.toString();
+    }
+
+    private updateLines(lines: number) {
+        this.lines += lines;
+        this.score += lines === 1 ? Score.Line : ~~(lines * Score.Line * Score.LineCooef);
+
+        Graphic.lines.textContent = this.lines.toString();
+        Graphic.score.textContent = this.score.toString();
     }
 }

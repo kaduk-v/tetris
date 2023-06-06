@@ -21,6 +21,15 @@ export enum Direction {
     Down
 }
 
+export enum Score {
+    Shape = 10,
+    Line = 100,
+    LineCooef = 1.5
+}
+
+export const maxLine = 10;
+export const maxLevel = 5;
+
 /**
  * Keyboard code.
  */
@@ -44,7 +53,7 @@ export enum ShapeRotation {
 export enum Playfield {
     Width = 10,
     Height = 20,
-    LineWidth = 0.1, // block stroke
+    LineWidth = 1, // block stroke
     BlockSide = 25, // 25px
     MovementSpeed = 1000 // 1 sec
 }
@@ -52,14 +61,14 @@ export enum Playfield {
 export enum Color {
     Blue = '#0662ea',
     Green = '#37ab0c',
-    Gray = '#535360',
+    Gray = '#808080',
+    LightGray = 'rgba(153,153,153,0.12)',
     LightBlue = '#41bef8',
-    Purple = '#7929f1',
-    Orange = '#ea8706',
+    Purple = 'rgba(121,41,241,0.9)',
+    Orange = '#EA8706',
     Red = '#f30000',
     White = '#ffffff',
     Yellow = '#fff000',
+    Pink = '#e67cf1',
 }
-
-
 

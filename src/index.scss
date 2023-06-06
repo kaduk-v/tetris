@@ -8,12 +8,23 @@ body {
   color: $text;
 }
 
-#root {
-  padding: 10px;
-  margin: 10px;
-  border: 1px solid saddlebrown;
+.container {
+  margin: 20px;
+  display: flex;
+  justify-content: center;
 }
 
-canvas {
-  border: 1px solid darkgreen;
+#playfield, .side-panel {
+  padding: 5px;
+  border: 2px solid #bab8b8;
+}
+
+.side-panel {
+  margin: 0 5px;
+  width: 100px;
+
+  .value {
+    font-weight: bold;
+    color: rgb(153, 153, 153);
+  }
 }
