@@ -20,10 +20,11 @@ export class IntervalTimer {
     /**
      * Set interval timer.
      */
-    start() {
+    start(timeout?: number) {
+        timeout = timeout || this.timeout;
         this.clear();
 
-        this.intervalId = setInterval(() => this.run(), this.timeout);
+        this.intervalId = setInterval(() => this.run(), timeout);
     }
 
     pause() {

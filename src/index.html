@@ -1,35 +1,46 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" href="/public/favicon.ico" type="image/png">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/public/favicon.ico" type="image/png">
 
-  <title>Tetris</title>
+    <title>Tetris</title>
 </head>
 
 <body>
+<div class="logo">
+    <img src="/public/img/logo.png" width="200">
+</div>
+
 <div class="container">
-  <canvas id="playfield"></canvas>
+    <canvas id="playfield"></canvas>
+    <div class="side-panel">
+        <div class="score">
+            <span class="text">Score</span>
+            <span class="value">0</span>
+        </div>
 
-  <div class="side-panel">
-    <div class="score">
-      <span class="text">Score</span>
-      <span class="value">0</span>
+        <div class="level">
+            <span class="text">Level</span>
+            <span class="value">1</span>
+        </div>
+
+        <div class="lines">
+            <span class="text">Lines</span>
+            <span class="value">0</span>
+        </div>
+
+        <div class="next-shape">
+            <span class="text">Next</span>
+            <canvas id="next-shape"></canvas>
+        </div>
+
+        <!--    <div class="game-info">-->
+        <!--      <div>Pause</div>-->
+        <!--    </div>-->
     </div>
-
-    <div class="level">
-      <span class="text">Level</span>
-      <span class="value">1</span>
-    </div>
-
-    <div class="lines">
-      <span class="text">Lines</span>
-      <span class="value">0</span>
-    </div>
-  </div>
-
 </div>
 </body>
 </html>

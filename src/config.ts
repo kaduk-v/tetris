@@ -8,7 +8,6 @@ export interface PlayfieldBlock {
     color?: Color;
     width?: number;
     height?: number;
-    borderColor?: Color;
 }
 
 /**
@@ -23,8 +22,7 @@ export enum Direction {
 
 export enum Score {
     Shape = 10,
-    Line = 100,
-    LineCooef = 1.5
+    LinesPerLevel = 3
 }
 
 export const maxLine = 10;
@@ -59,16 +57,18 @@ export enum Playfield {
 }
 
 export enum Color {
-    Blue = '#0662ea',
-    Green = '#37ab0c',
+    Blue = '#0662EA',
+    BlueGray = '#91A2C2',
+    Green = '#37AB0C',
     Gray = '#808080',
     LightGray = 'rgba(153,153,153,0.12)',
-    LightBlue = '#41bef8',
+    LightBlue = '#41BEF8',
     Purple = 'rgba(121,41,241,0.9)',
     Orange = '#EA8706',
     Red = '#f30000',
-    White = '#ffffff',
-    Yellow = '#fff000',
-    Pink = '#e67cf1',
+    White = '#FFFFFF',
+    Sand = '#E1BE7C',
+    Pink = '#E67CF1',
+    Slate = '#7184A5',
 }
 

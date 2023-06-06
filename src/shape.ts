@@ -227,16 +227,16 @@ export class ShapeL extends Shape {
 }
 
 
-// TODO: additional shapes
+// ------ Additional shapes --------------
 export class ShapeDot extends Shape {
-    color: Color = Color.Orange;
+    color: Color = Color.Sand;
     tetromino: Matrix2D = [
         [ 1 ],
     ];
 }
 
 export class ShapeX extends Shape {
-    color: Color = Color.Orange;
+    color: Color = Color.Slate;
     tetromino: Matrix2D = [
         [ 0, 1, 0 ],
         [ 1, 1, 1 ],
@@ -245,7 +245,7 @@ export class ShapeX extends Shape {
 }
 
 export class ShapeU extends Shape {
-    color: Color = Color.Orange;
+    color: Color = Color.BlueGray;
     tetromino: Matrix2D = [
         [ 1, 0, 1 ],
         [ 1, 1, 1 ],

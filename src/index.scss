@@ -4,27 +4,48 @@
 
 body {
   font-family: 'Montserrat';
-  background-color: #fff;
+  background-color: #fffcf9;
   color: $text;
 }
 
-.container {
-  margin: 20px;
+.container, .logo {
   display: flex;
+  margin: 20px;
   justify-content: center;
 }
 
 #playfield, .side-panel {
+  background: #ffffff;
   padding: 5px;
   border: 2px solid #bab8b8;
 }
 
 .side-panel {
+  display: flex;
   margin: 0 5px;
   width: 100px;
+  flex-direction: column;
+
+  .score, .level, .lines {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+  }
 
   .value {
     font-weight: bold;
     color: rgb(153, 153, 153);
+  }
+}
+
+#next-shape {
+  margin-top: 10px;
+}
+
+.next-shape {
+  margin-top: 20px;
+
+  .text {
+    margin-bottom: 10px;
   }
 }
