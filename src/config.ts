@@ -11,7 +11,10 @@ export interface PlayfieldBlock {
     borderColor?: Color;
 }
 
-export enum MovementDirection {
+/**
+ * Shape movement direction.
+ */
+export enum Direction {
     Up,
     Right,
     Left,

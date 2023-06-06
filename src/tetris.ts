@@ -1,5 +1,5 @@
 import { GridMatrix2D, Matrix2D, Shape, ShapeI, ShapeJ, ShapeL, ShapeO, ShapeS, ShapeT } from "./shape";
-import { Color, Coordinate, Key, MovementDirection, Playfield, ShapeRotation } from "./config";
+import { Color, Coordinate, Key, Direction, Playfield, ShapeRotation } from "./config";
 import { hasMatrix2DElement, random } from "./helper";
 import { Graphic } from "./graphic";
 import { IntervalTimer } from "./interval-timer";
@@ -70,7 +70,7 @@ export class Tetris {
     private playRound() {
         this.timer.pause();
 
-        const shapeMoved = this.moveShape(MovementDirection.Down);
+        const shapeMoved = this.moveShape(Direction.Down);
 
         // continue the movement of the shape
         if (shapeMoved) {
@@ -95,7 +95,7 @@ export class Tetris {
      * @param direction
      * @return {boolean} Moved or not the shape.
      */
-    private moveShape(direction: MovementDirection) {
+    private moveShape(direction: Direction) {
         // cannot move shapes on pause
         if (this.pause) {
             return;
@@ -277,17 +277,17 @@ export class Tetris {
             switch (e.code) {
                 case Key.Left:
                 case Key.A:
-                    this.moveShape(MovementDirection.Left);
+                    this.moveShape(Direction.Left);
                     break;
 
                 case Key.Right:
                 case Key.D:
-                    this.moveShape(MovementDirection.Right);
+                    this.moveShape(Direction.Right);
                     break;
 
                 case Key.Down:
                 case Key.S:
-                    this.moveShape(MovementDirection.Down);
+                    this.moveShape(Direction.Down);
                     break;
 
                 case Key.Up:

@@ -1,4 +1,4 @@
-import { Color, Coordinate, MovementDirection, Playfield, ShapeRotation } from "./config";
+import { Color, Coordinate, Direction, Playfield, ShapeRotation } from "./config";
 
 /**
  * Two-dimensional matrix.
@@ -34,7 +34,7 @@ export abstract class Shape {
      *
      * @param [direction] - Shape movement direction.
      */
-    move(direction: MovementDirection): Coordinate[] {
+    move(direction: Direction): Coordinate[] {
         if (!this.coordinates.length) {
             throw new Error('Shape doesnt have coordinates');
         }
@@ -43,13 +43,13 @@ export abstract class Shape {
             const [ y, x ] = coordinate;
 
             switch (direction) {
-                case MovementDirection.Left:
+                case Direction.Left:
                     return [ y, x - 1 ];
 
-                case MovementDirection.Right:
+                case Direction.Right:
                     return [ y, x + 1 ];
 
-                case MovementDirection.Down:
+                case Direction.Down:
                     return [ y + 1, x ];
             }
         });
@@ -107,7 +107,7 @@ export abstract class Shape {
         this.coordinates = coordinates;
     }
 
-    offsetTetromino(direction: MovementDirection): void {
+    offsetTetromino(direction: Direction): void {
         const [ y, x ] = this.tetrominoStart;
 
         // reflection symmetry
@@ -119,19 +119,19 @@ export abstract class Shape {
         const h = Playfield.Height - vertical;
 
         switch (direction) {
-            case MovementDirection.Left:
+            case Direction.Left:
                 if (x - 1 >= 0) {
                     this.tetrominoStart = [ y, x - 1 ];
                 }
 
                 break;
-            case MovementDirection.Right:
+            case Direction.Right:
                 if (x + 1 <= w) {
                     this.tetrominoStart = [ y, x + 1 ];
                 }
 
                 break;
-            case MovementDirection.Down:
+            case Direction.Down:
                 if (y + 1 <= h) {
                     this.tetrominoStart = [ y + 1, x ];
                 }
