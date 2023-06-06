@@ -67,6 +67,10 @@ export class Tetris {
         this.timer.start();
     }
 
+    private restart() {
+        // todo: implement
+    }
+
     private playRound() {
         this.timer.pause();
 
@@ -169,7 +173,14 @@ export class Tetris {
         this.shape.tetrominoStart = [ 0, coordinateX ];
         this.shape.updateCoordinates(0, coordinateX);
 
-        this.drawShape();
+        const canInit: boolean = this.isCoordinateAvailable(this.shape.coordinates);
+
+        if (canInit) {
+            this.drawShape();
+        } else {
+            this.pause = true;
+            this.timer.pause()
+        }
     }
 
     /**

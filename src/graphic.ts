@@ -28,7 +28,7 @@ class Graphic {
             return Graphic.instance;
         }
 
-        Graphic.canvas = document.createElement('canvas');
+        Graphic.canvas = document.querySelector('canvas');
 
         Graphic.canvas.height = Playfield.Height * Playfield.BlockSide;
         Graphic.canvas.width = Playfield.Width * Playfield.BlockSide;
