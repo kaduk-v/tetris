@@ -1,7 +1,8 @@
-import { GridItem, GridMatrix2D, Matrix2D, Shape, ShapeI, ShapeJ, ShapeL, ShapeO, ShapeS, ShapeT } from "./shape";
+import { GridMatrix2D, Matrix2D, Shape, ShapeI, ShapeJ, ShapeL, ShapeO, ShapeS, ShapeT } from "./shape";
 import { Color, Coordinate, Key, MovementDirection, Playfield, ShapeRotation } from "./config";
 import { hasMatrix2DElement, random } from "./helper";
 import { Graphic } from "./graphic";
+import { IntervalTimer } from "./interval-timer";
 
 
 export class Tetris {
@@ -16,7 +17,10 @@ export class Tetris {
     level = 1;
 
     topScore = 0;
+
     lines = 0;
+
+    pause = false;
 
     /**
      * Playfield to render.
@@ -31,7 +35,6 @@ export class Tetris {
      */
     playfield: Matrix2D = [ ...Array(Playfield.Height) ].map(e => Array(Playfield.Width).fill(0));
 
-
     /**
      * Current (active) shape.
      */
@@ -42,27 +45,83 @@ export class Tetris {
      */
     nextShape: Shape;
 
+    timer: IntervalTimer;
+
+    constructor() {
+        this.timer = new IntervalTimer(this.playRound.bind(this), Playfield.MovementSpeed);
+    }
+
+    public init() {
+        this.drawPlayfield();
+
+        // todo: draw side panel
+
+        this.shape = this.getRandomShape();
+        this.nextShape = this.getRandomShape();
+
+        this.initControls();
+    }
+
+    public play() {
+        this.initShape();
+        this.timer.start();
+    }
+
+    private playRound() {
+        this.timer.pause();
+
+        const shapeMoved = this.moveShape(MovementDirection.Down);
+
+        // continue the movement of the shape
+        if (shapeMoved) {
+            this.timer.resume();
+        }
+
+        // can't move - shape has reached max bottom position
+        else {
+            this.lockShape();
+            this.addNextShape();
+            this.processLines();
+            this.initShape();
+
+            // start round with new shape
+            this.timer.start();
+        }
+    }
+
     /**
      * Move shape accordind to direction.
      *
      * @param direction
      * @return {boolean} Moved or not the shape.
      */
-    moveShape(direction: MovementDirection) {
+    private moveShape(direction: MovementDirection) {
+        // cannot move shapes on pause
+        if (this.pause) {
+            return;
+        }
+
         const newCoordinates: Coordinate[] = this.shape.move(direction);
         const canMove: boolean = this.isCoordinateAvailable(newCoordinates);
 
         if (canMove) {
             this.clearShape();
+
             this.shape.offsetTetromino(direction);
             this.shape.coordinates = newCoordinates;
+
             this.drawShape();
         }
 
         return canMove;
     }
 
-    rotateShape() {
+    private rotateShape() {
+        // cannot rotate shapes on pause
+        if (this.pause) {
+            return;
+        }
+
         this.clearShape()
         this.shape.rotate();
 
@@ -76,46 +135,17 @@ export class Tetris {
         this.drawShape();
     }
 
-    drawShape() {
+    private drawShape() {
         this.shape.coordinates.map(coordinate => Graphic.draw(coordinate, {
             color: this.shape.color,
             borderColor: Color.White
         }));
     }
 
-    clearShape() {
+    private clearShape() {
         this.shape.coordinates.map(coordinate => Graphic.clear(coordinate, {
             borderColor: Color.Gray
         }));
-    }
-
-    highlightLine() {
-        const width = Playfield.Width * 25
-
-
-        setInterval(() => {
-            for (let i = 0; i < Playfield.Height; i++) {
-                Graphic.draw([ 4, i ], { width, color: Color.Purple, borderColor: Color.White })
-            }
-        }, 800)
-
-        setInterval(() => {
-            for (let i = 0; i < Playfield.Height; i++) {
-                Graphic.draw([ 4, i ], { width, color: Color.White, borderColor: Color.Gray })
-            }
-        }, 900)
-
-    }
-
-    init() {
-        this.drawPlayfield();
-
-        // todo: draw side panel
-
-        this.shape = this.getRandomShape();
-        this.nextShape = this.getRandomShape();
-
-        this.initControls();
     }
 
     private drawPlayfield() {
@@ -130,7 +160,10 @@ export class Tetris {
         })
     }
 
-    startLevel() {
+    /**
+     * Draw shape on started position.
+     */
+    private initShape() {
         const coordinateX = this.getStartXCoordinate();
 
         this.shape.tetrominoStart = [ 0, coordinateX ];
@@ -139,38 +172,22 @@ export class Tetris {
         this.drawShape();
     }
 
-    timerId: ReturnType<typeof setTimeout>
-
-    play() {
-        this.startLevel();
-
-        this.timerId = setInterval(() => {
-            const moved = this.moveShape(MovementDirection.Down);
-
-            if (moved) return;
-
-            this.lockShape();
-            this.addNextShape();
-            this.checkLines();
-            this.startLevel();
-
-        }, 1000);
-    }
-
+    /**
+     * To fix shape coordinates on playfield.
+     */
     private lockShape() {
-        this.shape.coordinates.map(coor => {
-            const [ y, x ] = coor;
+        this.shape.coordinates.map(coordinate => {
+            const [ y, x ] = coordinate;
 
             this.playfield[y][x] = 1;
             this.grid[y][x] = {
                 color: this.shape.color,
                 filled: true
             };
-
         });
     }
 
-    private checkLines() {
+    private processLines() {
         const lines: number[] = [];
 
         // check filled lines
@@ -179,13 +196,13 @@ export class Tetris {
         });
 
         // no filled lines yet
-        if (!lines.length) return;
+        if (!lines.length) {
+            return;
+        }
 
         // todo: update score
         this.score += 10;
         this.lines += lines.length;
-
-        this.stopFallingShapes();
 
         // update playfield grid state
         lines.forEach((line) => {
@@ -203,10 +220,6 @@ export class Tetris {
         this.drawPlayfield();
         this.removeLines(lines);
         this.drawPlayfield();
-
-        this.play()
-
-        // setTimeout(()=> this.play(), 1000)
     }
 
     private addNextShape() {
@@ -229,35 +242,26 @@ export class Tetris {
     }
 
     private removeLines(lines: number[]) {
-        const playfield: Matrix2D = [ ...Array(lines.length) ].map(e => Array(Playfield.Width).fill(0));
-        const grid: GridMatrix2D = [ ...Array(lines.length) ].map(e => Array(Playfield.Width).fill({
-            color: Color.White,
-            filled: false
-        }));
-
         for (let i = 0; i < lines.length; i++) {
             const y = lines[i];
 
-            this.playfield.splice(y, y);
-            this.grid.splice(y, y);
+            const playfield: Matrix2D = [ ...Array(1) ].map(e => Array(Playfield.Width).fill(0));
+            const grid: GridMatrix2D = [ ...Array(1) ].map(e => Array(Playfield.Width).fill({
+                color: Color.White,
+                filled: false
+            }));
+
+            this.playfield.splice(y, 1);
+            this.grid.splice(y, 1);
+
+            // add new lines at the beginning instead of deleted ones
+            this.playfield.unshift(...playfield);
+            this.grid.unshift(...grid);
         }
-
-        // todo: here bug. incorrect add new several lines
-
-        // add new lines at the beginning instead of deleted ones
-        this.playfield.unshift(...playfield);
-        this.grid.unshift(...grid);
 
         if (this.playfield.length !== Playfield.Height) {
             throw new Error('Incorrect remove lines');
         }
-    }
-
-    /**
-     * Stop the falling shapes.
-     */
-    private stopFallingShapes() {
-        clearInterval(this.timerId);
     }
 
     /**
@@ -269,6 +273,7 @@ export class Tetris {
 
     private initControls() {
         document.addEventListener("keydown", (e: KeyboardEvent) => {
+
             switch (e.code) {
                 case Key.Left:
                 case Key.A:
@@ -291,7 +296,9 @@ export class Tetris {
                     break;
 
                 case Key.Space:
-                    console.log('TODO: Pause/Play');
+                    this.pause = !this.pause;
+
+                    this.pause ? this.timer.pause() : this.timer.resume();
                     break;
             }
         });
