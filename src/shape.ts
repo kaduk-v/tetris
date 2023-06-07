@@ -1,4 +1,4 @@
-import { Color, Coordinate, Direction, Playfield, ShapeRotation } from "./config";
+import { Color, Coordinate, Direction, PlayfieldType, ShapeRotation } from "./config";
 
 /**
  * Two-dimensional matrix.
@@ -115,8 +115,8 @@ export abstract class Shape {
         const vertical = this.tetromino.length;
 
         // playfield size
-        const w = Playfield.Width - horizontal;
-        const h = Playfield.Height - vertical;
+        const w = PlayfieldType.Width - horizontal;
+        const h = PlayfieldType.Height - vertical;
 
         switch (direction) {
             case Direction.Left:
@@ -226,8 +226,8 @@ export class ShapeL extends Shape {
     ];
 }
 
-
 // ------ Additional shapes --------------
+
 export class ShapeDot extends Shape {
     color: Color = Color.Sand;
     tetromino: Matrix2D = [
@@ -245,10 +245,18 @@ export class ShapeX extends Shape {
 }
 
 export class ShapeU extends Shape {
-    color: Color = Color.BlueGray;
+    color: Color = Color.SteelBlue;
     tetromino: Matrix2D = [
         [ 1, 0, 1 ],
         [ 1, 1, 1 ],
         [ 0, 0, 0 ],
+    ];
+}
+
+export class ShapeShortL extends Shape {
+    color: Color = Color.Brown;
+    tetromino: Matrix2D = [
+        [ 1, 0 ],
+        [ 1, 1 ],
     ];
 }

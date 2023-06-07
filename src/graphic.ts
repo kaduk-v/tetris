@@ -1,120 +1,111 @@
-import { Color, Coordinate, Playfield, PlayfieldBlock } from "./config";
-import { Matrix2D } from "./shape";
+import { Color, Coordinate, defaultShapeBlock, NextShapeType, PlayfieldType, ShapeBlock } from "./config";
 
-const defaultBlock: PlayfieldBlock = {
-    color: Color.LightGray,
-    width: Playfield.BlockSide,
-    height: Playfield.BlockSide,
-}
+/**
+ * Singleton. Class has only one instance.
+ */
+export abstract class CanvasArea {
+    private instance: CanvasArea;
 
-class Graphic {
-    private static instance: Graphic;
+    protected _canvas: HTMLCanvasElement;
+    protected _context: CanvasRenderingContext2D;
 
-    public static canvas: HTMLCanvasElement;
-    public static context: CanvasRenderingContext2D;
+    get canvas(): HTMLCanvasElement {
+        return this._canvas;
+    }
 
-    public static canvasSide: HTMLCanvasElement;
-    public static contextSide: CanvasRenderingContext2D;
-
-    public static score: HTMLElement;
-    public static lines: HTMLElement;
-    public static level: HTMLElement;
-
-    /**
-     * The Singleton's constructor should always be private to prevent direct
-     * construction calls with the `new` operator.
-     */
-    private constructor() {
+    get context(): CanvasRenderingContext2D {
+        return this._context;
     }
 
     /**
      * The static method that controls the access to the singleton instance.
      */
-    public static getInstance(): Graphic {
-        if (Graphic.instance) {
-            return Graphic.instance;
+    public getInstance(selector: string, width: number, height: number): CanvasArea {
+        if (this.instance) {
+            return this.instance;
         }
 
-        Graphic.canvas = document.querySelector('#playfield');
-        Graphic.canvasSide = document.querySelector('#next-shape');
+        this._canvas = document.querySelector(selector);
 
-        Graphic.score = document.querySelector('.side-panel .score .value');
-        Graphic.lines = document.querySelector('.side-panel .lines .value');
-        Graphic.level = document.querySelector('.side-panel .level .value');
+        this._canvas.height = height * PlayfieldType.BlockSide;
+        this._canvas.width = width * PlayfieldType.BlockSide;
 
-        Graphic.canvas.height = Playfield.Height * Playfield.BlockSide;
-        Graphic.canvas.width = Playfield.Width * Playfield.BlockSide;
+        this._context = this._canvas.getContext('2d');
 
-        Graphic.canvasSide.height = 3 * Playfield.BlockSide;
-        Graphic.canvasSide.width = 4 * Playfield.BlockSide;
+        this.instance = this;
 
-        Graphic.instance = new Graphic();
-        Graphic.context = Graphic.canvas.getContext('2d');
-
-        Graphic.contextSide = Graphic.canvasSide.getContext('2d');
-
-        return Graphic.instance;
+        return this;
     }
 
-    public static draw(coordinate: Coordinate, block: PlayfieldBlock) {
-        const ctx = Graphic.context;
-        const x = coordinate[1] * Playfield.BlockSide;
-        const y = coordinate[0] * Playfield.BlockSide;
+    /**
+     * Draw one piece of shape by coordinates.
+     *
+     * @param [coordinate] Shape block coordinate.
+     * @param [block] Shape block config.
+     */
+    public drawShapeBlock(coordinate: Coordinate, block: ShapeBlock) {
+        const ctx = this._context;
+        const targetBlock = { ...defaultShapeBlock, ...block };
+        const { side, color } = targetBlock;
 
-        const targetBlock = { ...defaultBlock, ...block };
-
-        // shape block full size
-        const { width, height } = targetBlock;
+        // start block coordinates
+        const x = coordinate[1] * side;
+        const y = coordinate[0] * side;
 
         // outer border
-        ctx.clearRect(x, y, width, height);
+        ctx.clearRect(x, y, side, side);
 
         // outer rectangle
-        ctx.fillStyle = targetBlock.color;
-        ctx.fillRect(x + 1, y + 1, width - 2, height - 2);
+        ctx.fillStyle = color;
+        ctx.fillRect(x + 1, y + 1, side - 2, side - 2);
 
         // inner border
-        ctx.clearRect(x + 2, y + 2, width - 5, height - 5);
+        ctx.clearRect(x + 2, y + 2, side - 5, side - 5);
 
         // inner rectangle
-        ctx.fillStyle = targetBlock.color;
-        ctx.fillRect(x + 5, y + 5, width - 10, height - 10);
+        ctx.fillStyle = color;
+        ctx.fillRect(x + 5, y + 5, side - 10, side - 10);
     }
 
-    public static drawSide(coordinate: Coordinate, block: PlayfieldBlock) {
-        const ctx = Graphic.contextSide;
-        const x = coordinate[1] * Playfield.BlockSide;
-        const y = coordinate[0] * Playfield.BlockSide;
-
-        const targetBlock = { ...defaultBlock, ...block };
-
-        // shape block full size
-        const { width, height } = targetBlock;
-
-        // outer border
-        ctx.clearRect(x, y, width, height);
-
-        // outer rectangle
-        ctx.fillStyle = targetBlock.color;
-        ctx.fillRect(x + 1, y + 1, width - 2, height - 2);
-
-        // inner border
-        ctx.clearRect(x + 2, y + 2, width - 5, height - 5);
-
-        // inner rectangle
-        ctx.fillStyle = targetBlock.color;
-        ctx.fillRect(x + 5, y + 5, width - 10, height - 10);
+    public clearShapeBlock(coordinate: Coordinate) {
+        this.drawShapeBlock(coordinate, { color: Color.LightGray });
     }
 
-    public static clear(coordinate: Coordinate, block: PlayfieldBlock = defaultBlock) {
-        Graphic.draw(coordinate, { color: Color.LightGray });
-    }
+    /**
+     * Clear canvas area. Fill by empty shape blocks.
+     */
+    public abstract clearArea(): void;
+}
 
-    public static clearPlayfield() {
-        Graphic.context.clearRect(0, 0, Playfield.Width * Playfield.BlockSide, Playfield.Height * Playfield.BlockSide);
+class PlayfieldArea extends CanvasArea {
+    clearArea(): void {
+        const w = PlayfieldType.Width * PlayfieldType.BlockSide;
+        const h = PlayfieldType.Height * PlayfieldType.BlockSide;
+
+        this._context.clearRect(0, 0, w, h);
     }
 }
 
-Graphic.getInstance();
+class NextShapeArea extends CanvasArea {
+    clearArea(): void {
+        const w = NextShapeType.Width * NextShapeType.BlockSide;
+        const h = NextShapeType.Height * NextShapeType.BlockSide;
 
-export { Graphic };
+        this._context.clearRect(0, 0, w, h);
+    }
+}
+
+export class GraphicFactory {
+
+    createPlayfieldArea(): PlayfieldArea {
+        const canvasArea = new PlayfieldArea();
+
+        return canvasArea.getInstance('#playfield', PlayfieldType.Width, PlayfieldType.Height);
+    }
+
+    createNextShapeArea(): NextShapeArea {
+        const canvasArea = new NextShapeArea();
+
+        return canvasArea.getInstance('#next-shape', NextShapeType.Width, NextShapeType.Height);
+    }
+}

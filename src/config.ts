@@ -4,12 +4,6 @@
  */
 export type Coordinate = [ number, number ];
 
-export interface PlayfieldBlock {
-    color?: Color;
-    width?: number;
-    height?: number;
-}
-
 /**
  * Shape movement direction.
  */
@@ -24,9 +18,6 @@ export enum Score {
     Shape = 10,
     LinesPerLevel = 3
 }
-
-export const maxLine = 10;
-export const maxLevel = 5;
 
 /**
  * Keyboard code.
@@ -48,17 +39,22 @@ export enum ShapeRotation {
     CounterClockwise = 2,
 }
 
-export enum Playfield {
+export enum PlayfieldType {
     Width = 10,
     Height = 20,
-    LineWidth = 1, // block stroke
     BlockSide = 25, // 25px
     MovementSpeed = 1000 // 1 sec
 }
 
+export enum NextShapeType {
+    Width = 4,
+    Height = 3,
+    BlockSide = 25
+}
+
 export enum Color {
     Blue = '#0662EA',
-    BlueGray = '#91A2C2',
+    Brown = '#A52A2A',
     Green = '#37AB0C',
     Gray = '#808080',
     LightGray = 'rgba(153,153,153,0.12)',
@@ -66,9 +62,25 @@ export enum Color {
     Purple = 'rgba(121,41,241,0.9)',
     Orange = '#EA8706',
     Red = '#f30000',
-    White = '#FFFFFF',
     Sand = '#E1BE7C',
+    SteelBlue = '#4682B4',
     Pink = '#E67CF1',
     Slate = '#7184A5',
+    White = '#FFFFFF',
 }
 
+/**
+ * Shape block (formerly Square) - is one piece of shape.
+ */
+export type ShapeBlock = {
+    color: Color;
+    side?: number;
+}
+
+export const defaultShapeBlock: ShapeBlock = {
+    color: Color.LightGray,
+    side: PlayfieldType.BlockSide,
+}
+
+export const maxLine = 10;
+export const maxLevel = 5;

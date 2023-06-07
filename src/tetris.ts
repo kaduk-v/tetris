@@ -7,15 +7,30 @@ import {
     ShapeJ,
     ShapeL,
     ShapeO,
-    ShapeS,
-    ShapeT, ShapeU,
+    ShapeS, ShapeShortL,
+    ShapeT,
+    ShapeU,
     ShapeX
 } from "./shape";
-import { Color, Coordinate, Direction, Key, maxLevel, Playfield, Score, ShapeRotation } from "./config";
+import {
+    Color,
+    Coordinate,
+    Direction,
+    Key,
+    maxLevel,
+    NextShapeType,
+    PlayfieldType,
+    Score,
+    ShapeRotation
+} from "./config";
 import { hasMatrix2DElement, random } from "./helper";
-import { Graphic } from "./graphic";
+import { CanvasArea, GraphicFactory } from "./graphic";
 import { IntervalTimer } from "./interval-timer";
 
+
+const scoreElement: Element = document.querySelector('.side-panel .score .value');
+const linesElement = document.querySelector('.side-panel .lines .value');
+const levelElement = document.querySelector('.side-panel .level .value');
 
 export class Tetris {
     /**
@@ -29,11 +44,20 @@ export class Tetris {
     level = 1;
     lines = 0;
     pause = false;
+    gameOver = false;
 
     /**
-     * Playfield to render.
+     * Grid to render playfield area.
      */
-    grid: GridMatrix2D = [ ...Array(Playfield.Height) ].map(e => Array(Playfield.Width).fill({
+    playfieldGrid: GridMatrix2D = [ ...Array(PlayfieldType.Height) ].map(e => Array(PlayfieldType.Width).fill({
+        color: Color.LightGray,
+        filled: false
+    }));
+
+    /**
+     * Grid to render next shape area.
+     */
+    nextShapeGrid: GridMatrix2D = [ ...Array(NextShapeType.Height) ].map(e => Array(NextShapeType.Width).fill({
         color: Color.LightGray,
         filled: false
     }));
@@ -41,9 +65,7 @@ export class Tetris {
     /**
      * Active playfield state.
      */
-    playfield: Matrix2D = [ ...Array(Playfield.Height) ].map(e => Array(Playfield.Width).fill(0));
-
-    side: Matrix2D = [ ...Array(3) ].map(e => Array(4).fill(0));
+    playfield: Matrix2D = [ ...Array(PlayfieldType.Height) ].map(e => Array(PlayfieldType.Width).fill(0));
 
     /**
      * Current (active) shape.
@@ -54,26 +76,36 @@ export class Tetris {
      * Next shape.
      */
     nextShape: Shape;
+
+    /**
+     * Available shapes.
+     */
+    shapes: typeof Shape[] = [
+        ShapeT,
+        ShapeI,
+        ShapeO,
+        ShapeO,
+        ShapeS,
+        ShapeJ,
+        ShapeL,
+    ];
+
+    playfieldArea: CanvasArea;
+    nextShapeArea: CanvasArea;
+
     timer: IntervalTimer;
 
-    shapes: typeof Shape[];
-
     constructor() {
-        this.timer = new IntervalTimer(this.playRound.bind(this), Playfield.MovementSpeed);
-        this.shapes = [
-            ShapeT,
-            ShapeI,
-            ShapeO,
-            ShapeO,
-            ShapeS,
-            ShapeJ,
-            ShapeL,
-        ]
+        const factory = new GraphicFactory();
+
+        this.timer = new IntervalTimer(this.playRound.bind(this), PlayfieldType.MovementSpeed);
+        this.playfieldArea = factory.createPlayfieldArea();
+        this.nextShapeArea = factory.createNextShapeArea();
     }
 
     public init() {
-        this.drawPlayfield();
-        this.drawNextShape();
+        this.drawPlayfieldArea();
+        this.drawNextShapeArea();
 
         this.shape = this.getRandomShape();
         this.nextShape = this.getRandomShape();
@@ -90,11 +122,8 @@ export class Tetris {
         // todo: timeout not work
         // todo: timeout not correct calc
 
-        const levelSpeed = ~~(Playfield.MovementSpeed / maxLevel);
-        const timeout = Playfield.MovementSpeed - (levelSpeed * (this.level - 1));
-
-        console.log('levelSpeed: ', levelSpeed);
-        console.log('timeout: ', timeout);
+        const levelSpeed = ~~(PlayfieldType.MovementSpeed / maxLevel);
+        const timeout = PlayfieldType.MovementSpeed - (levelSpeed * (this.level - 1));
 
         this.timer.start(timeout);
     }
@@ -126,9 +155,9 @@ export class Tetris {
     }
 
     /**
-     * Move shape accordind to direction.
+     * Move shape according to direction.
      *
-     * @param direction
+     * @param [direction]
      * @return {boolean} Moved or not the shape.
      */
     private moveShape(direction: Direction) {
@@ -153,7 +182,7 @@ export class Tetris {
     }
 
     private rotateShape() {
-        // cannot rotate shapes on pause
+        // cannot rotate shape on pause
         if (this.pause) {
             return;
         }
@@ -172,62 +201,40 @@ export class Tetris {
     }
 
     private drawShape() {
-        this.shape.coordinates.map(coordinate => Graphic.draw(coordinate, {
-            color: this.shape.color,
-        }));
-    }
-
-    private drawShapeSide() {
-        this.drawNextShape()
-
-        const tetromino = this.nextShape.tetromino
-        const coordinates: Coordinate[] = [];
-
-        // iterate rows
-        for (let y = 0; y < tetromino.length; y++) {
-            const hasRowBlock = tetromino[y].some(block => block === 1);
-
-            if (!hasRowBlock) {
-                continue;
-            }
-
-            // iterate row cells
-            for (let x = 0; x < tetromino[y].length; x++) {
-                const block = tetromino[y][x];
-
-                if (block === 1) {
-                    coordinates.push([ y, x ]);
-                }
-            }
-        }
-
-        coordinates.map(coordinate => Graphic.drawSide(coordinate, {
-            color: this.nextShape.color,
-        }));
-    }
-
-    private clearShape() {
-        this.shape.coordinates.map(coordinate => Graphic.clear(coordinate));
-    }
-
-    private drawPlayfield() {
-        Graphic.clearPlayfield();
-
-        this.grid.forEach((cells, y) => {
-            cells.forEach((cell, x) => {
-                const { color, filled } = cell;
-
-                Graphic.draw([ y, x ], { color });
-            });
-        });
+        this.shape.coordinates.map(coordinate => this.playfieldArea.drawShapeBlock(coordinate, { color: this.shape.color }));
     }
 
     private drawNextShape() {
-        Graphic.contextSide.clearRect(0, 0, 4 * Playfield.BlockSide, 3 * Playfield.BlockSide);
+        this.drawNextShapeArea();
 
-        this.side.forEach((cells, y) => {
+        const coordinateX = ~~((NextShapeType.Width - this.nextShape.tetromino[0].length) / 2);
+
+        this.nextShape.updateCoordinates(0, coordinateX);
+        this.nextShape.coordinates.map(coordinate => this.nextShapeArea.drawShapeBlock(coordinate, { color: this.nextShape.color }));
+    }
+
+    private clearShape() {
+        this.shape.coordinates.map(coordinate => this.playfieldArea.clearShapeBlock(coordinate));
+    }
+
+    private drawPlayfieldArea() {
+        this.playfieldArea.clearArea();
+
+        this.playfieldGrid.forEach((cells, y) => {
+            cells.forEach((cell, x) => this.playfieldArea.drawShapeBlock([ y, x ], {
+                color: cell.color,
+                side: PlayfieldType.BlockSide
+            }));
+        });
+    }
+
+    private drawNextShapeArea() {
+        this.nextShapeArea.clearArea();
+
+        // always draw this area with empty blocks
+        this.nextShapeGrid.forEach((cells, y) => {
             cells.forEach((cell, x) => {
-                Graphic.drawSide([ y, x ], { color: Color.LightGray });
+                this.nextShapeArea.drawShapeBlock([ y, x ], { color: Color.LightGray, side: NextShapeType.BlockSide });
             });
         });
     }
@@ -241,7 +248,7 @@ export class Tetris {
         this.shape.tetrominoStart = [ 0, coordinateX ];
         this.shape.updateCoordinates(0, coordinateX);
 
-        this.drawShapeSide();
+        this.drawNextShape();
 
         const canInit: boolean = this.isCoordinateAvailable(this.shape.coordinates);
 
@@ -261,7 +268,7 @@ export class Tetris {
             const [ y, x ] = coordinate;
 
             this.playfield[y][x] = 1;
-            this.grid[y][x] = {
+            this.playfieldGrid[y][x] = {
                 color: this.shape.color,
                 filled: true
             };
@@ -285,7 +292,7 @@ export class Tetris {
 
         // update playfield grid state
         lines.forEach((line) => {
-            this.grid[line] = this.grid[line].map(cell => {
+            this.playfieldGrid[line] = this.playfieldGrid[line].map(cell => {
                 return {
                     color: Color.Gray,
                     filled: true
@@ -293,13 +300,11 @@ export class Tetris {
             });
         });
 
-        this.updateLines(lines.length);
-        this.updateLevel();
+        this.updateLines(lines);
 
         // re-draw playfield
-        this.drawPlayfield();
         this.removeLines(lines);
-        this.drawPlayfield();
+        this.drawPlayfieldArea();
     }
 
     private addNextShape() {
@@ -316,22 +321,23 @@ export class Tetris {
     private removeLines(lines: number[]) {
         for (let i = 0; i < lines.length; i++) {
             const y = lines[i];
+            const w = PlayfieldType.Width;
 
-            const playfield: Matrix2D = [ ...Array(1) ].map(e => Array(Playfield.Width).fill(0));
-            const grid: GridMatrix2D = [ ...Array(1) ].map(e => Array(Playfield.Width).fill({
+            const playfield: Matrix2D = [ ...Array(1) ].map(e => Array(w).fill(0));
+            const grid: GridMatrix2D = [ ...Array(1) ].map(e => Array(w).fill({
                 color: Color.LightGray,
                 filled: false
             }));
 
             this.playfield.splice(y, 1);
-            this.grid.splice(y, 1);
+            this.playfieldGrid.splice(y, 1);
 
             // add new lines at the beginning instead of deleted ones
             this.playfield.unshift(...playfield);
-            this.grid.unshift(...grid);
+            this.playfieldGrid.unshift(...grid);
         }
 
-        if (this.playfield.length !== Playfield.Height) {
+        if (this.playfield.length !== PlayfieldType.Height) {
             throw new Error('Incorrect remove lines');
         }
     }
@@ -404,15 +410,14 @@ export class Tetris {
     private updateScore() {
         this.score += Score.Shape;
 
-        Graphic.score.textContent = this.score.toString();
+        scoreElement.textContent = this.score.toString();
     }
 
-    private updateLines(lines: number) {
+    private updateLines(lines: number[]) {
         const n = (this.level + 1);
 
-        this.lines += lines;
-
-        switch (lines) {
+        // update score by current level
+        switch (lines.length) {
             case 1:
                 this.score += 40 * n;
                 break;
@@ -430,30 +435,55 @@ export class Tetris {
                 throw new Error(`Too many lines at the same time. Count of lines ${lines}`);
         }
 
-        Graphic.lines.textContent = this.lines.toString();
-        Graphic.score.textContent = this.score.toString();
+        // update lines & level
+        for (let i = 0; i < lines.length; i++) {
+            this.lines++;
+            this.updateLevel();
+        }
+
+        // update side-bar info
+        linesElement.textContent = this.lines.toString();
+        scoreElement.textContent = this.score.toString();
+        levelElement.textContent = this.level.toString();
     }
 
-    private updateLevel() {
-        if (this.level === maxLevel) return;
+    private updateLevel(): void {
+        if (this.level === maxLevel) {
+            return;
+        }
 
-        // todo: level calc not correct
-
-        if ((this.level * this.lines) / Score.LinesPerLevel > 1) {
+        if (this.lines % Score.LinesPerLevel === 0) {
             this.level++;
-            Graphic.level.textContent = this.level.toString();
-        }
 
-        if (this.level === 2) {
-            this.shapes.push(ShapeU);
+            this.addShapeByLevel();
         }
+    }
 
-        if (this.level === 3) {
-            this.shapes.push(ShapeX);
-        }
+    private addShapeByLevel() {
+        switch (this.level) {
+            case 2:
+                this.shapes.push(ShapeU);
 
-        if (this.level === 4) {
-            this.shapes.push(ShapeDot);
+                console.log('U - added.');
+                break;
+
+            case 3:
+                this.shapes.push(ShapeX);
+
+                console.log('X - added.');
+                break;
+
+            case 4:
+                this.shapes.push(ShapeDot);
+
+                console.log('Dot - added.')
+                break;
+
+            case 5:
+                this.shapes.push(ShapeShortL);
+
+                console.log('Short L - added.');
+                break;
         }
     }
 }

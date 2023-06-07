@@ -1,9 +1,25 @@
 import './index.html';
 import './index.scss';
 import { Tetris } from "./tetris";
-import { Graphic } from "./graphic";
+
+/**
+ * TODO:
+ *  - menu
+ *  - pause/play UI
+ *  - game over
+ *  - top score
+ *  - new shape notice
+ *  - sound
+ */
 
 const game = new Tetris();
 
-game.init();
-game.play();
+try {
+    game.init();
+    game.play();
+} catch (e) {
+    console.log('------------------[ START ]----------------')
+    console.log(e)
+    console.log('------------------[  END ]-----------------')
+}
+
