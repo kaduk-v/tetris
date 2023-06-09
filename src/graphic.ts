@@ -8,9 +8,6 @@ import {
     ShapeBlock
 } from "./config";
 
-/**
- *
- */
 export abstract class CanvasArea {
     protected _canvas: HTMLCanvasElement;
     protected _context: CanvasRenderingContext2D;

@@ -11,19 +11,19 @@ export abstract class Shape {
      */
     abstract tetromino: Matrix2D;
 
-    tetrominoStart: Coordinate = [ 0, 0 ];
+    public tetrominoStart: Coordinate = [ 0, 0 ];
 
     /**
      * Shape blocks coordinates on playfield.
      */
-    coordinates: Coordinate[];
+    public coordinates: Coordinate[];
 
     /**
      * Fetch new shape coordinates according to movement direction.
      *
      * @param [direction] - Shape movement direction.
      */
-    move(direction: Direction): Coordinate[] {
+    public move(direction: Direction): Coordinate[] {
         if (!this.coordinates.length) {
             throw new Error('Shape doesnt have coordinates');
         }
@@ -47,7 +47,7 @@ export abstract class Shape {
     /**
      * Rotate a 2 dimensional matrix 90 degrees.
      */
-    rotate(rotation: ShapeRotation = ShapeRotation.Clockwise): void {
+    public rotate(rotation: ShapeRotation = ShapeRotation.Clockwise): void {
         const [ offsetY, offsetX ] = this.tetrominoStart;
 
         switch (rotation) {
@@ -72,7 +72,7 @@ export abstract class Shape {
      * @param [offsetY] - Offset shape down.
      * @param [offsetX] - Offset shape right.
      */
-    updateCoordinates(offsetY: number = 0, offsetX: number = 0) {
+    public updateCoordinates(offsetY: number = 0, offsetX: number = 0) {
         const coordinates: Coordinate[] = [];
 
         // iterate rows
@@ -96,7 +96,7 @@ export abstract class Shape {
         this.coordinates = coordinates;
     }
 
-    offsetTetromino(direction: Direction): void {
+    public offsetTetromino(direction: Direction): void {
         const [ y, x ] = this.tetrominoStart;
 
         // reflection symmetry

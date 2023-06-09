@@ -39,20 +39,24 @@ export class Tetris {
     /**
      * Game score.
      */
-    score = 0;
+    private score = 0;
 
     /**
      * Game level.
      */
-    level = 1;
-    lines = 0;
-    pause = false;
-    gameOver = false;
+    private level = 1;
+    private lines = 0;
+    private onPause = false;
+
+    /**
+     * Last round tick time.
+     */
+    private prevTime: number = 0;
 
     /**
      * Grid to render playfield area.
      */
-    playfieldGrid: GridMatrix2D = [ ...Array(PlayfieldType.Height) ].map(e => Array(PlayfieldType.Width).fill({
+    private playfieldGrid: GridMatrix2D = [ ...Array(PlayfieldType.Height) ].map(e => Array(PlayfieldType.Width).fill({
         color: Color.LightGray,
         filled: false
     }));
@@ -60,7 +64,7 @@ export class Tetris {
     /**
      * Grid to render next shape area.
      */
-    nextShapeGrid: GridMatrix2D = [ ...Array(NextShapeType.Height) ].map(e => Array(NextShapeType.Width).fill({
+    private nextShapeGrid: GridMatrix2D = [ ...Array(NextShapeType.Height) ].map(e => Array(NextShapeType.Width).fill({
         color: Color.LightGray,
         filled: false
     }));
@@ -68,22 +72,22 @@ export class Tetris {
     /**
      * Active playfield state.
      */
-    playfield: Matrix2D = [ ...Array(PlayfieldType.Height) ].map(e => Array(PlayfieldType.Width).fill(0));
+    private playfield: Matrix2D = [ ...Array(PlayfieldType.Height) ].map(e => Array(PlayfieldType.Width).fill(0));
 
     /**
      * Current (active) shape.
      */
-    shape: Shape;
+    private shape: Shape;
 
     /**
      * Next shape.
      */
-    nextShape: Shape;
+    private nextShape: Shape;
 
     /**
      * Available shapes.
      */
-    shapes: typeof Shape[] = [
+    private shapes: typeof Shape[] = [
         ShapeT,
         ShapeI,
         ShapeO,
@@ -123,26 +127,30 @@ export class Tetris {
         this.start();
     }
 
-    private prevTime: number = 0;
-    private gameSpeed: number = 0;
-
     private start() {
-        this.gameSpeed = PlayfieldType.MovementSpeed - (levelSpeed * (this.level - 1));
+        this.animationId = requestAnimationFrame(this.runRoundTick.bind(this));
+    }
 
-        requestAnimationFrame(this.runRoundTick.bind(this));
+    private pause() {
+        cancelAnimationFrame(this.animationId);
     }
 
     private restart() {
         // todo: implement
     }
 
+    private gameOver() {
+        // todo: implement
+        cancelAnimationFrame(this.animationId);
+    }
+
     private runRoundTick() {
-        requestAnimationFrame(this.runRoundTick.bind(this));
+        this.animationId = requestAnimationFrame(this.runRoundTick.bind(this));
 
         const now = Date.now();
         const diff = (now - this.prevTime);
 
-        if (diff > this.gameSpeed) {
+        if (diff > this.gameSpeed()) {
             const shapeMoved = this.moveShape(Direction.Down);
 
             // can't move - shape has reached max bottom position
@@ -164,11 +172,6 @@ export class Tetris {
      * @return {boolean} Moved or not the shape.
      */
     private moveShape(direction: Direction) {
-        // cannot move shapes on pause
-        if (this.pause) {
-            return;
-        }
-
         const newCoordinates: Coordinate[] = this.shape.move(direction);
         const canMove: boolean = this.isCoordinateAvailable(newCoordinates);
 
@@ -181,28 +184,17 @@ export class Tetris {
             this.drawShape();
         }
 
-        // todo
-        if (canMove) {
-            // remove shape coor
-            // add new coor
-        }
-
         return canMove;
     }
 
     private rotateShape() {
-        // cannot rotate shape on pause
-        if (this.pause) {
-            return;
-        }
-
         this.clearShape()
         this.shape.rotate();
 
         const canRotate: boolean = this.isCoordinateAvailable(this.shape.coordinates);
 
+        // rollback
         if (!canRotate) {
-            // rollback
             this.shape.rotate(ShapeRotation.CounterClockwise);
         }
 
@@ -224,9 +216,6 @@ export class Tetris {
 
     private clearShape() {
         this.shape.coordinates.map(coordinate => this.playfieldArea.clearShapeBlock(coordinate));
-    }
-
-    private removeShape(coordinate: Coordinate) {
     }
 
     private drawPlayfieldArea() {
@@ -264,11 +253,7 @@ export class Tetris {
 
         const canInit: boolean = this.isCoordinateAvailable(this.shape.coordinates);
 
-        if (canInit) {
-            this.drawShape();
-        } else {
-            this.pause = true;
-        }
+        canInit ? this.drawShape() : this.gameOver();
     }
 
     /**
@@ -353,6 +338,13 @@ export class Tetris {
     private initControls() {
         document.addEventListener("keydown", (e: KeyboardEvent) => {
 
+            console.log('e.code: ', e.code);
+
+            // cannot move shape on pause
+            if (this.onPause && e.code !== Key.Space) {
+                return;
+            }
+
             switch (e.code) {
                 case Key.Left:
                 case Key.A:
@@ -375,13 +367,11 @@ export class Tetris {
                     break;
 
                 case Key.Space:
-                    this.pause = !this.pause;
+                    console.log(' this.onPause: before ',  this.onPause);
+                    this.onPause = !this.onPause;
+                    console.log(' this.onPause: ',  this.onPause);
 
-                    if (this.pause) {
-                        console.log('TODO: Pause')
-                    } else {
-                        console.log('TODO: Resume')
-                    }
+                    this.onPause ? this.pause() : this.start();
 
                     break;
             }
@@ -491,5 +481,10 @@ export class Tetris {
                 console.log('Short L - added.');
                 break;
         }
+    }
+
+    private gameSpeed(): number {
+        console.log('gameSpeed: ', PlayfieldType.MovementSpeed - (levelSpeed * (this.level - 1)));
+        return PlayfieldType.MovementSpeed - (levelSpeed * (this.level - 1));
     }
 }
