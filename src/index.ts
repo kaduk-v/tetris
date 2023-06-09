@@ -15,8 +15,10 @@ import { Tetris } from "./tetris";
 const game = new Tetris();
 
 try {
-    game.init();
-    game.play();
+    game
+        .init()
+        .play()
+    ;
 } catch (e) {
     console.log('------------------[ START ]----------------')
     console.log(e)

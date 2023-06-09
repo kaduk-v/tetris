@@ -1,11 +1,17 @@
-import { Color, Coordinate, defaultShapeBlock, NextShapeType, PlayfieldType, ShapeBlock } from "./config";
+import {
+    Color,
+    Coordinate,
+    defaultShapeBlock,
+    emptyGridBlock,
+    NextShapeType,
+    PlayfieldType,
+    ShapeBlock
+} from "./config";
 
 /**
- * Singleton. Class has only one instance.
+ *
  */
 export abstract class CanvasArea {
-    private instance: CanvasArea;
-
     protected _canvas: HTMLCanvasElement;
     protected _context: CanvasRenderingContext2D;
 
@@ -17,24 +23,13 @@ export abstract class CanvasArea {
         return this._context;
     }
 
-    /**
-     * The static method that controls the access to the singleton instance.
-     */
-    public getInstance(selector: string, width: number, height: number): CanvasArea {
-        if (this.instance) {
-            return this.instance;
-        }
-
+    public constructor(selector: string, width: number, height: number) {
         this._canvas = document.querySelector(selector);
 
         this._canvas.height = height * PlayfieldType.BlockSide;
         this._canvas.width = width * PlayfieldType.BlockSide;
 
         this._context = this._canvas.getContext('2d');
-
-        this.instance = this;
-
-        return this;
     }
 
     /**
@@ -68,7 +63,7 @@ export abstract class CanvasArea {
     }
 
     public clearShapeBlock(coordinate: Coordinate) {
-        this.drawShapeBlock(coordinate, { color: Color.LightGray });
+        this.drawShapeBlock(coordinate, { color: emptyGridBlock.color });
     }
 
     /**
@@ -98,14 +93,10 @@ class NextShapeArea extends CanvasArea {
 export class GraphicFactory {
 
     createPlayfieldArea(): PlayfieldArea {
-        const canvasArea = new PlayfieldArea();
-
-        return canvasArea.getInstance('#playfield', PlayfieldType.Width, PlayfieldType.Height);
+        return new PlayfieldArea('#playfield', PlayfieldType.Width, PlayfieldType.Height);
     }
 
     createNextShapeArea(): NextShapeArea {
-        const canvasArea = new NextShapeArea();
-
-        return canvasArea.getInstance('#next-shape', NextShapeType.Width, NextShapeType.Height);
+        return new NextShapeArea('#next-shape', NextShapeType.Width, NextShapeType.Height);
     }
 }

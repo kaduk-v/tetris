@@ -1,6 +1,5 @@
-import { Matrix2D } from "./shape";
-import { Coordinate } from "./config";
 import * as _ from "lodash";
+import { Coordinate, Matrix2D} from "./config";
 
 export const hasMatrix2DElement = (matrix: Matrix2D, row: number, col: number): boolean => {
     return matrix[row] !== undefined && matrix[row][col] !== undefined;
@@ -11,5 +10,5 @@ export const issetCoordinate = (coordinates: Coordinate[], y: number, x: number)
 }
 
 export const random = (list: any[]) => {
-    return _.sample(list);
+    return _.sample(_.shuffle(list).reverse());
 }

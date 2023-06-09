@@ -1,8 +1,4 @@
-/**
- * @param [number] Y-Axis. First element.
- * @param [number] X-Axis. Second element.
- */
-export type Coordinate = [ number, number ];
+// ========================== ENUMS ==========================
 
 /**
  * Shape movement direction.
@@ -16,7 +12,7 @@ export enum Direction {
 
 export enum Score {
     Shape = 10,
-    LinesPerLevel = 3
+    LinesPerLevel = 3 // to get next level
 }
 
 /**
@@ -77,6 +73,39 @@ export type ShapeBlock = {
     side?: number;
 }
 
+// ========================== TYPES ==========================
+
+/**
+ * Two-dimensional matrix.
+ */
+export type Matrix2D = number[][];
+
+export type GridBlock = {
+    color: Color,
+    filled: boolean
+}
+
+export type GridMatrix2D = GridBlock[][];
+
+/**
+ * @param [number] Y-Axis. First element.
+ * @param [number] X-Axis. Second element.
+ */
+export type Coordinate = [ number, number ];
+
+
+// ========================== CONSTANTS ==========================
+
+export const highlightedLineBlock: GridBlock = {
+    color: Color.Gray,
+    filled: true
+}
+
+export const emptyGridBlock: GridBlock = {
+    color: Color.LightGray,
+    filled: false,
+}
+
 export const defaultShapeBlock: ShapeBlock = {
     color: Color.LightGray,
     side: PlayfieldType.BlockSide,
@@ -84,3 +113,4 @@ export const defaultShapeBlock: ShapeBlock = {
 
 export const maxLine = 10;
 export const maxLevel = 5;
+export const levelSpeed = ~~(PlayfieldType.MovementSpeed / maxLevel);

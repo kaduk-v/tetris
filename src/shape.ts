@@ -1,15 +1,4 @@
-import { Color, Coordinate, Direction, PlayfieldType, ShapeRotation } from "./config";
-
-/**
- * Two-dimensional matrix.
- */
-export type Matrix2D = number[][];
-
-export type GridItem = {
-    color: Color,
-    filled: boolean
-}
-export type GridMatrix2D = GridItem[][];
+import { Color, Coordinate, Direction, Matrix2D, PlayfieldType, ShapeRotation } from "./config";
 
 export abstract class Shape {
     /**

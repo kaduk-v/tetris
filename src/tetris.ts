@@ -1,6 +1,20 @@
 import {
+    Coordinate,
     GridMatrix2D,
     Matrix2D,
+    Color,
+    Direction,
+    Key,
+    NextShapeType,
+    ShapeRotation,
+    PlayfieldType,
+    Score,
+    highlightedLineBlock,
+    maxLevel,
+    emptyGridBlock, levelSpeed,
+} from "./config";
+
+import {
     Shape,
     ShapeDot,
     ShapeI,
@@ -12,20 +26,9 @@ import {
     ShapeU,
     ShapeX
 } from "./shape";
-import {
-    Color,
-    Coordinate,
-    Direction,
-    Key,
-    maxLevel,
-    NextShapeType,
-    PlayfieldType,
-    Score,
-    ShapeRotation
-} from "./config";
+
 import { hasMatrix2DElement, random } from "./helper";
 import { CanvasArea, GraphicFactory } from "./graphic";
-import { IntervalTimer } from "./interval-timer";
 
 
 const scoreElement: Element = document.querySelector('.side-panel .score .value');
@@ -90,15 +93,15 @@ export class Tetris {
         ShapeL,
     ];
 
-    playfieldArea: CanvasArea;
-    nextShapeArea: CanvasArea;
+    private playfieldArea: CanvasArea;
+    private nextShapeArea: CanvasArea;
 
-    timer: IntervalTimer;
+    private timerId: ReturnType<typeof setTimeout>;
+    private animationId: ReturnType<typeof requestAnimationFrame>;
 
     constructor() {
         const factory = new GraphicFactory();
 
-        this.timer = new IntervalTimer(this.playRound.bind(this), PlayfieldType.MovementSpeed);
         this.playfieldArea = factory.createPlayfieldArea();
         this.nextShapeArea = factory.createNextShapeArea();
     }
@@ -111,46 +114,46 @@ export class Tetris {
         this.nextShape = this.getRandomShape();
 
         this.initControls();
+
+        return this;
     }
 
     public play() {
-        this.initShape();
+        this.initRound();
         this.start();
     }
 
+    private prevTime: number = 0;
+    private gameSpeed: number = 0;
+
     private start() {
-        // todo: timeout not work
-        // todo: timeout not correct calc
+        this.gameSpeed = PlayfieldType.MovementSpeed - (levelSpeed * (this.level - 1));
 
-        const levelSpeed = ~~(PlayfieldType.MovementSpeed / maxLevel);
-        const timeout = PlayfieldType.MovementSpeed - (levelSpeed * (this.level - 1));
-
-        this.timer.start(timeout);
+        requestAnimationFrame(this.runRoundTick.bind(this));
     }
 
     private restart() {
         // todo: implement
     }
 
-    private playRound() {
-        this.timer.pause();
+    private runRoundTick() {
+        requestAnimationFrame(this.runRoundTick.bind(this));
 
-        const shapeMoved = this.moveShape(Direction.Down);
+        const now = Date.now();
+        const diff = (now - this.prevTime);
 
-        // continue the movement of the shape
-        if (shapeMoved) {
-            this.timer.resume();
-        }
+        if (diff > this.gameSpeed) {
+            const shapeMoved = this.moveShape(Direction.Down);
 
-        // can't move - shape has reached max bottom position
-        else {
-            this.lockShape();
-            this.addNextShape();
-            this.processLines();
-            this.initShape();
+            // can't move - shape has reached max bottom position
+            if (!shapeMoved) {
+                this.lockShapeOnGrid();
+                this.addNextShape();
+                this.processLines();
+                this.initRound();
+            }
 
-            // start round with new shape
-            this.start();
+            this.prevTime = now;
         }
     }
 
@@ -176,6 +179,12 @@ export class Tetris {
             this.shape.coordinates = newCoordinates;
 
             this.drawShape();
+        }
+
+        // todo
+        if (canMove) {
+            // remove shape coor
+            // add new coor
         }
 
         return canMove;
@@ -217,6 +226,9 @@ export class Tetris {
         this.shape.coordinates.map(coordinate => this.playfieldArea.clearShapeBlock(coordinate));
     }
 
+    private removeShape(coordinate: Coordinate) {
+    }
+
     private drawPlayfieldArea() {
         this.playfieldArea.clearArea();
 
@@ -242,7 +254,7 @@ export class Tetris {
     /**
      * Draw shape on started position.
      */
-    private initShape() {
+    private initRound() {
         const coordinateX = this.getStartXCoordinate();
 
         this.shape.tetrominoStart = [ 0, coordinateX ];
@@ -256,14 +268,13 @@ export class Tetris {
             this.drawShape();
         } else {
             this.pause = true;
-            this.timer.pause()
         }
     }
 
     /**
      * To fix shape coordinates on playfield.
      */
-    private lockShape() {
+    private lockShapeOnGrid() {
         this.shape.coordinates.map(coordinate => {
             const [ y, x ] = coordinate;
 
@@ -280,7 +291,7 @@ export class Tetris {
     private processLines() {
         const lines: number[] = [];
 
-        // check filled lines
+        // collect filled lines
         this.playfield.forEach((cells: number[], line: number) => {
             cells.every(cell => cell === 1) ? lines.push(line) : null;
         });
@@ -290,19 +301,12 @@ export class Tetris {
             return;
         }
 
-        // update playfield grid state
-        lines.forEach((line) => {
-            this.playfieldGrid[line] = this.playfieldGrid[line].map(cell => {
-                return {
-                    color: Color.Gray,
-                    filled: true
-                }
-            });
-        });
+        // highlight filled line
+        lines.forEach((line) => this.playfieldGrid[line] = this.playfieldGrid[line].map(cell => highlightedLineBlock));
 
-        this.updateLines(lines);
+        this.updateGameProgress(lines);
 
-        // re-draw playfield
+        // render playfield
         this.removeLines(lines);
         this.drawPlayfieldArea();
     }
@@ -324,10 +328,7 @@ export class Tetris {
             const w = PlayfieldType.Width;
 
             const playfield: Matrix2D = [ ...Array(1) ].map(e => Array(w).fill(0));
-            const grid: GridMatrix2D = [ ...Array(1) ].map(e => Array(w).fill({
-                color: Color.LightGray,
-                filled: false
-            }));
+            const grid: GridMatrix2D = [ ...Array(1) ].map(e => Array(w).fill(emptyGridBlock));
 
             this.playfield.splice(y, 1);
             this.playfieldGrid.splice(y, 1);
@@ -376,15 +377,10 @@ export class Tetris {
                 case Key.Space:
                     this.pause = !this.pause;
 
-
                     if (this.pause) {
-                        this.timer.pause();
-
-
-                        // todo: render pause
+                        console.log('TODO: Pause')
                     } else {
-                        this.timer.resume();
-                        // todo: clear pause
+                        console.log('TODO: Resume')
                     }
 
                     break;
@@ -413,10 +409,17 @@ export class Tetris {
         scoreElement.textContent = this.score.toString();
     }
 
-    private updateLines(lines: number[]) {
+    /**
+     * Update value of score, lines, level.
+     * Also add new shapes to game.
+     *
+     * @param [lines]
+     */
+    private updateGameProgress(lines: number[]) {
+        // score depends on current level
         const n = (this.level + 1);
 
-        // update score by current level
+        // update score by count of filled lines
         switch (lines.length) {
             case 1:
                 this.score += 40 * n;
@@ -432,13 +435,13 @@ export class Tetris {
                 break;
 
             default:
-                throw new Error(`Too many lines at the same time. Count of lines ${lines}`);
+                throw new Error(`Too many lines at the same time. Count of lines - ${lines}`);
         }
 
-        // update lines & level
+        // update count lines & current level
         for (let i = 0; i < lines.length; i++) {
             this.lines++;
-            this.updateLevel();
+            this.increaseLevel();
         }
 
         // update side-bar info
@@ -447,7 +450,7 @@ export class Tetris {
         levelElement.textContent = this.level.toString();
     }
 
-    private updateLevel(): void {
+    private increaseLevel(): void {
         if (this.level === maxLevel) {
             return;
         }
@@ -455,11 +458,14 @@ export class Tetris {
         if (this.lines % Score.LinesPerLevel === 0) {
             this.level++;
 
-            this.addShapeByLevel();
+            this.enrichShapesList();
         }
     }
 
-    private addShapeByLevel() {
+    /**
+     * With each new level, we add a new shape to the game.
+     */
+    private enrichShapesList() {
         switch (this.level) {
             case 2:
                 this.shapes.push(ShapeU);
