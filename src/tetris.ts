@@ -140,8 +140,10 @@ export class Tetris {
     }
 
     private gameOver() {
-        // todo: implement
+        // todo: implement restart
         cancelAnimationFrame(this.animationId);
+
+        this.playfieldArea.drawGaveOver();
     }
 
     private runRoundTick() {
@@ -337,9 +339,6 @@ export class Tetris {
 
     private initControls() {
         document.addEventListener("keydown", (e: KeyboardEvent) => {
-
-            console.log('e.code: ', e.code);
-
             // cannot move shape on pause
             if (this.onPause && e.code !== Key.Space) {
                 return;
@@ -367,10 +366,7 @@ export class Tetris {
                     break;
 
                 case Key.Space:
-                    console.log(' this.onPause: before ',  this.onPause);
                     this.onPause = !this.onPause;
-                    console.log(' this.onPause: ',  this.onPause);
-
                     this.onPause ? this.pause() : this.start();
 
                     break;
@@ -484,7 +480,6 @@ export class Tetris {
     }
 
     private gameSpeed(): number {
-        console.log('gameSpeed: ', PlayfieldType.MovementSpeed - (levelSpeed * (this.level - 1)));
         return PlayfieldType.MovementSpeed - (levelSpeed * (this.level - 1));
     }
 }

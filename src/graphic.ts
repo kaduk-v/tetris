@@ -63,6 +63,34 @@ export abstract class CanvasArea {
         this.drawShapeBlock(coordinate, { color: emptyGridBlock.color });
     }
 
+    public drawGaveOver() {
+        const ctx = this.context;
+
+        const w = PlayfieldType.BlockSide * 8;
+        const h = PlayfieldType.BlockSide * 5;
+        const startX = PlayfieldType.BlockSide;
+        const startY = PlayfieldType.BlockSide * 7;
+
+        // outer border
+        ctx.clearRect(startX, startY, w, h);
+
+        // outer rectangle
+        ctx.fillStyle = Color.Gray;
+        ctx.fillRect(startX + 1, startY + 1, w - 3, h - 3);
+
+        ctx.clearRect(startX + 3, startY + 3, w - 7, h - 7);
+
+        // main text
+        ctx.font = "22px serif";
+        ctx.fillStyle = Color.Gray;
+        ctx.fillText("Game Over", startX + 38, startY + 55);
+
+        // sub-text
+        ctx.font = "12px serif";
+        ctx.fillStyle = Color.Slate;
+        ctx.fillText("Press Any Key To Start", startX + 30, startY + 85);
+    }
+
     /**
      * Clear canvas area. Fill by empty shape blocks.
      */
