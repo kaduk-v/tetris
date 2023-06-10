@@ -27,7 +27,7 @@ import {
     ShapeX
 } from "./shape";
 
-import { hasMatrix2DElement, random } from "./helper";
+import { emptyGrig, emptyMatrix2D, hasMatrix2DElement, random } from "./helper";
 import { CanvasArea, GraphicFactory } from "./graphic";
 
 
@@ -45,8 +45,10 @@ export class Tetris {
      * Game level.
      */
     private level = 1;
+
     private lines = 0;
     private onPause = false;
+    private gameOver = false;
 
     /**
      * Last round tick time.
@@ -56,23 +58,17 @@ export class Tetris {
     /**
      * Grid to render playfield area.
      */
-    private playfieldGrid: GridMatrix2D = [ ...Array(PlayfieldType.Height) ].map(e => Array(PlayfieldType.Width).fill({
-        color: Color.LightGray,
-        filled: false
-    }));
+    private playfieldGrid: GridMatrix2D = emptyGrig(PlayfieldType.Height, PlayfieldType.Width);
 
     /**
      * Grid to render next shape area.
      */
-    private nextShapeGrid: GridMatrix2D = [ ...Array(NextShapeType.Height) ].map(e => Array(NextShapeType.Width).fill({
-        color: Color.LightGray,
-        filled: false
-    }));
+    private nextShapeGrid: GridMatrix2D = emptyGrig(NextShapeType.Height, NextShapeType.Width);
 
     /**
      * Active playfield state.
      */
-    private playfield: Matrix2D = [ ...Array(PlayfieldType.Height) ].map(e => Array(PlayfieldType.Width).fill(0));
+    private playfield: Matrix2D = emptyMatrix2D(PlayfieldType.Height, PlayfieldType.Width);
 
     /**
      * Current (active) shape.
@@ -100,7 +96,6 @@ export class Tetris {
     private playfieldArea: CanvasArea;
     private nextShapeArea: CanvasArea;
 
-    private timerId: ReturnType<typeof setTimeout>;
     private animationId: ReturnType<typeof requestAnimationFrame>;
 
     constructor() {
@@ -108,6 +103,8 @@ export class Tetris {
 
         this.playfieldArea = factory.createPlayfieldArea();
         this.nextShapeArea = factory.createNextShapeArea();
+
+        this.initControls();
     }
 
     public init() {
@@ -116,10 +113,6 @@ export class Tetris {
 
         this.shape = this.getRandomShape();
         this.nextShape = this.getRandomShape();
-
-        this.initControls();
-
-        return this;
     }
 
     public play() {
@@ -133,16 +126,19 @@ export class Tetris {
 
     private pause() {
         cancelAnimationFrame(this.animationId);
+        this.playfieldArea.drawGaveOver()
     }
 
     private restart() {
-        // todo: implement
+        this.resetScore();
+        this.init();
+        this.play();
     }
 
-    private gameOver() {
-        // todo: implement restart
+    private gameFinish() {
         cancelAnimationFrame(this.animationId);
 
+        this.gameOver = true;
         this.playfieldArea.drawGaveOver();
     }
 
@@ -255,7 +251,7 @@ export class Tetris {
 
         const canInit: boolean = this.isCoordinateAvailable(this.shape.coordinates);
 
-        canInit ? this.drawShape() : this.gameOver();
+        canInit ? this.drawShape() : this.gameFinish();
     }
 
     /**
@@ -339,11 +335,14 @@ export class Tetris {
 
     private initControls() {
         document.addEventListener("keydown", (e: KeyboardEvent) => {
-            // cannot move shape on pause
-            if (this.onPause && e.code !== Key.Space) {
-                return;
-            }
 
+            // restart game
+            if (this.gameOver) return this.restart();
+
+            // cannot move shape on pause
+            if (this.onPause && e.code !== Key.Space) return;
+
+            // control game
             switch (e.code) {
                 case Key.Left:
                 case Key.A:
@@ -375,7 +374,7 @@ export class Tetris {
     }
 
     /**
-     * @param [coordinates] Shape coordinates;
+     * @param [coordinates] Shape coordinates.
      */
     private isCoordinateAvailable(coordinates: Coordinate[]): boolean {
         let available: boolean[] = [];
@@ -431,9 +430,28 @@ export class Tetris {
         }
 
         // update side-bar info
+        this.printScore();
+    }
+
+    private printScore() {
         linesElement.textContent = this.lines.toString();
         scoreElement.textContent = this.score.toString();
         levelElement.textContent = this.level.toString();
+    }
+
+    private resetScore() {
+        this.score = 0;
+        this.level = 0;
+        this.lines = 0;
+        this.prevTime = 0;
+        this.onPause = false;
+        this.gameOver = false;
+
+        this.playfieldGrid = emptyGrig(PlayfieldType.Height, PlayfieldType.Width);
+        this.nextShapeGrid = emptyGrig(NextShapeType.Height, NextShapeType.Width);
+        this.playfield = emptyMatrix2D(PlayfieldType.Height, PlayfieldType.Width);
+
+        this.printScore();
     }
 
     private increaseLevel(): void {
