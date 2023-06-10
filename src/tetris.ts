@@ -126,7 +126,6 @@ export class Tetris {
 
     private pause() {
         cancelAnimationFrame(this.animationId);
-        this.playfieldArea.drawGaveOver()
     }
 
     private restart() {
