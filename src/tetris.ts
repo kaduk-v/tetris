@@ -20,7 +20,7 @@ import {
     ShapeI,
     ShapeJ,
     ShapeL,
-    ShapeO,
+    ShapeO, ShapeP,
     ShapeS, ShapeShortL,
     ShapeT,
     ShapeU,
@@ -32,8 +32,19 @@ import { CanvasArea, GraphicFactory } from "./graphic";
 
 
 const scoreElement: Element = document.querySelector('.side-panel .score .value');
+const topScoreElement: Element = document.querySelector('.side-panel .top-score .value');
 const linesElement = document.querySelector('.side-panel .lines .value');
 const levelElement = document.querySelector('.side-panel .level .value');
+const pauseElement: HTMLElement = document.querySelector('.side-panel .game-pause');
+
+const baseShapeList: typeof Shape[] = [
+    ShapeT,
+    ShapeI,
+    ShapeO,
+    ShapeS,
+    ShapeJ,
+    ShapeL,
+];
 
 export class Tetris {
     /**
@@ -83,15 +94,7 @@ export class Tetris {
     /**
      * Available shapes.
      */
-    private shapes: typeof Shape[] = [
-        ShapeT,
-        ShapeI,
-        ShapeO,
-        ShapeO,
-        ShapeS,
-        ShapeJ,
-        ShapeL,
-    ];
+    private shapes: typeof Shape[] = [...baseShapeList];
 
     private playfieldArea: CanvasArea;
     private nextShapeArea: CanvasArea;
@@ -110,6 +113,7 @@ export class Tetris {
     public init() {
         this.drawPlayfieldArea();
         this.drawNextShapeArea();
+        this.printTopScore();
 
         this.shape = this.getRandomShape();
         this.nextShape = this.getRandomShape();
@@ -121,10 +125,12 @@ export class Tetris {
     }
 
     private start() {
+        pauseElement.style.setProperty('visibility', 'hidden');
         this.animationId = requestAnimationFrame(this.runRoundTick.bind(this));
     }
 
     private pause() {
+        pauseElement.style.setProperty('visibility', 'visible');
         cancelAnimationFrame(this.animationId);
     }
 
@@ -139,6 +145,11 @@ export class Tetris {
 
         this.gameOver = true;
         this.playfieldArea.drawGaveOver();
+
+        const topScore = +localStorage.getItem("top-score");
+        if (this.score > topScore) {
+            localStorage.setItem("top-score", this.score.toString());
+        }
     }
 
     private runRoundTick() {
@@ -436,6 +447,8 @@ export class Tetris {
         linesElement.textContent = this.lines.toString();
         scoreElement.textContent = this.score.toString();
         levelElement.textContent = this.level.toString();
+
+        this.printTopScore();
     }
 
     private resetScore() {
@@ -449,6 +462,8 @@ export class Tetris {
         this.playfieldGrid = emptyGrig(PlayfieldType.Height, PlayfieldType.Width);
         this.nextShapeGrid = emptyGrig(NextShapeType.Height, NextShapeType.Width);
         this.playfield = emptyMatrix2D(PlayfieldType.Height, PlayfieldType.Width);
+
+        this.shapes = [...baseShapeList];
 
         this.printScore();
     }
@@ -471,9 +486,9 @@ export class Tetris {
     private enrichShapesList() {
         switch (this.level) {
             case 2:
-                this.shapes.push(ShapeU);
+                this.shapes.push(ShapeP);
 
-                console.log('U - added.');
+                console.log('P - added.');
                 break;
 
             case 3:
@@ -498,5 +513,9 @@ export class Tetris {
 
     private gameSpeed(): number {
         return PlayfieldType.MovementSpeed - (levelSpeed * (this.level - 1));
+    }
+
+    private printTopScore() {
+        topScoreElement.textContent = localStorage.getItem("top-score") || '0';
     }
 }

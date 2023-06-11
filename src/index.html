@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/public/favicon.ico" type="image/png">
+    <link href='https://unpkg.com/css.gg@2.0.0/icons/css/play-pause.css' rel='stylesheet'>
 
     <title>Tetris</title>
 </head>
@@ -15,9 +16,14 @@
 </div>
 
 <div class="container">
-<!--    <div class="start-screen" data-start-screen>Press Any Key To Start</div>-->
+    <!--    <div class="start-screen" data-start-screen>Press Any Key To Start</div>-->
     <canvas id="playfield"></canvas>
     <div class="side-panel">
+        <div class="top-score">
+            <span class="text">Top score</span>
+            <span class="value">0</span>
+        </div>
+
         <div class="score">
             <span class="text">Score</span>
             <span class="value">0</span>
@@ -38,9 +44,10 @@
             <canvas id="next-shape"></canvas>
         </div>
 
-        <!--    <div class="game-info">-->
-        <!--      <div>Pause</div>-->
-        <!--    </div>-->
+        <div class="game-pause">
+            <div>pause</div>
+            <i class="gg-play-pause"></i>
+        </div>
     </div>
 </div>
 </body>

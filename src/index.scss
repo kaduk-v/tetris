@@ -23,18 +23,38 @@ body {
 .side-panel {
   display: flex;
   margin: 0 5px;
-  width: 100px;
+  width: 140px;
   flex-direction: column;
 
-  .score, .level, .lines {
+  .score, .top-score, .level, .lines {
     display: flex;
     justify-content: space-between;
     margin-bottom: 5px;
   }
 
+  .top-score {
+    font-weight: 600;
+  }
+
   .value {
     font-weight: 700;
     color: rgb(11, 58, 68);
+    font-size: 13px;
+  }
+
+  .game-pause {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 50px;
+    font-size: 17px;
+    font-weight: 700;
+    color: #53b3cb;
+    visibility: hidden;
+
+    .gg-play-pause {
+      margin: 0 5px;
+    }
   }
 }
 

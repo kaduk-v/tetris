@@ -12,7 +12,7 @@ export enum Direction {
 
 export enum Score {
     Shape = 10,
-    LinesPerLevel = 3 // to get next level
+    LinesPerLevel = 5 // to get next level
 }
 
 /**

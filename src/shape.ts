@@ -242,6 +242,15 @@ export class ShapeU extends Shape {
     ];
 }
 
+export class ShapeP extends Shape {
+    color: Color = Color.SteelBlue;
+    tetromino: Matrix2D = [
+        [ 1, 1, 0 ],
+        [ 1, 1, 0 ],
+        [ 1, 0, 0 ],
+    ];
+}
+
 export class ShapeShortL extends Shape {
     color: Color = Color.Brown;
     tetromino: Matrix2D = [
