@@ -55,7 +55,7 @@ export class Tetris {
     /**
      * Game level.
      */
-    private level = 1;
+    private level = 0;
 
     private lines = 0;
     private onPause = false;
