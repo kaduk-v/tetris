@@ -10,6 +10,8 @@ const height = 500;
 canvas.width = width;
 canvas.height = height;
 
+const img = document.getElementById('unit') as HTMLImageElement;
+
 /**
  * Keyboard code.
  */
@@ -39,19 +41,22 @@ class Keyboard {
 }
 
 class Player {
-    private height = 40;
-    private width = 20;
+    private height = 60;
+    private width = 50;
     private x = 0;
     private y = height - this.height;
     private speed = 0;
     private vy = 0;
     private weight = 1;
 
+
     public draw() {
         const { x, y, width, height } = this;
 
-        ctx.fillStyle = 'orange';
-        ctx.fillRect(x, y, width, height)
+        // ctx.fillStyle = 'orange';
+        // ctx.fillRect(x, y, width, height)
+
+        ctx.drawImage(img, x, y, this.width, this.height);
     }
 
     public update(input: Keyboard) {
@@ -67,7 +72,7 @@ class Player {
         }
 
         if (input.has(Key.Up) && this.onGround()) {
-            this.vy = -30;
+            this.vy = -25;
         }
 
         // horizontal
@@ -108,4 +113,6 @@ const animate = () => {
     requestAnimationFrame(animate);
 }
 
-animate();
+window.addEventListener('load', () => {
+    animate();
+})
