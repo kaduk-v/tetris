@@ -9,7 +9,7 @@
       "esnext",
       "dom"
     ],
-    "target": "es5",
+    "target": "es6",
     "allowJs": false,
     "moduleResolution": "node"
   }
