@@ -1,84 +1,74 @@
 import './index.html';
 import './index.scss';
 
-type State = {
-    name: string;
-    frames: number;
-}
-
-type Position = {
-    x: number;
-    y: number;
-}
-
-type AnimationSprite = {
-    [name: string]: {
-        loc: Position[]
-    };
-}
-
 const canvas = document.getElementById('playfield') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d');
-const playerSprite = require('../public/shadow-dog.png')
+const enemy1 = require('../public/enemies/enemy1.png');
 
 const containerWidth = canvas.width = 600;
 const containerHeight = canvas.height = 600;
-const staggerFrames = 5;
+const enemiesCount = 10;
+const enemies: Enemy[] = [];
 
-const playerImg = new Image();
-playerImg.src = playerSprite;
+const enemyImg = new Image();
+enemyImg.src = enemy1;
 
-const spriteWidth: number = 575;
-const spriteHeight: number = 523;
+let gameFrames = 0;
 
-let gameFrame = 0;
+class Enemy {
+    private speed = 2;
+    private spriteWidth = 293;
+    private spriteHeight = 155;
+    private width = this.spriteWidth / 2.5;
+    private height = this.spriteHeight / 2.5;
+    private x = Math.random() * (containerWidth - this.width);
+    private y = Math.random() * (containerHeight - this.height);
+    private frame = 0;
+    private flapSpeed = Math.floor((Math.random() * 3) + 1);
 
-const animation: AnimationSprite = {};
-const states: State[] = [
-    { name: 'idle', frames: 7 },
-    { name: 'jump', frames: 7 },
-    { name: 'fall', frames: 7 },
-    { name: 'run', frames: 9 },
-    { name: 'dizzy', frames: 11 },
-    { name: 'sit', frames: 5 },
-];
+    update() {
+        this.x += Math.random() * 15 - 7.5;
+        this.y += Math.random() * 10 - 5;
 
-states.map((state: State, idx: number) => {
-    let position: { loc: Position[] } = { loc: [] };
+        // animate sprites
+        if (gameFrames % this.flapSpeed === 0) {
+            this.frame > 4 ? this.frame = 0 : this.frame++;
+        }
 
-    for (let i = 0; i < state.frames; i++) {
-        const positionX = i * spriteWidth;
-        const positionY = idx * spriteHeight;
-
-        position.loc.push({ x: positionX, y: positionY });
+        return this;
     }
 
-    animation[state.name] = position;
-});
+    draw() {
+        ctx.drawImage(
+            enemyImg,
+            // cut img from sprite
+            this.frame * this.spriteWidth,
+            0,
+            this.spriteWidth,
+            this.spriteHeight,
+            // draw img on canvas
+            this.x,
+            this.y,
+            this.width,
+            this.height
+        );
 
-const state = 'dizzy';
+        return this;
+    }
+}
+
+
+for (let i = 0; i < enemiesCount; i++) {
+    enemies.push(new Enemy());
+}
+
 
 const animate = () => {
     ctx.clearRect(0, 0, containerWidth, containerHeight);
 
-    let position = Math.floor(gameFrame / staggerFrames) % animation[state].loc.length;
+    enemies.map(enemy => enemy.update().draw());
 
-    const frameX = spriteWidth * position;
-    const frameY = animation[state].loc[position].y;
-
-    ctx.drawImage(
-        playerImg,
-        frameX,
-        frameY,
-        spriteWidth,
-        spriteHeight,
-        0,
-        0,
-        spriteWidth,
-        spriteHeight
-    );
-
-    gameFrame++;
+    gameFrames++;
     requestAnimationFrame(animate);
 }
 
